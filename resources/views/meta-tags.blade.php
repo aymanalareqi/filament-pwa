@@ -68,103 +68,75 @@
       media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" 
       href="{{ asset('images/splash/ipad-pro-12.png') }}">
 
-{{-- PWA Installation Styles --}}
+{{-- PWA Installation Styles with Tailwind CSS and RTL/LTR Support --}}
 <style>
-    /* PWA Installation Banner Styles */
+    /* PWA Installation Banner - Using Tailwind-compatible classes with RTL/LTR support */
     .pwa-install-banner {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        @apply fixed bottom-0 inset-x-0 text-white p-4 transform translate-y-full transition-transform duration-300 ease-in-out z-[9999] shadow-2xl;
         background: linear-gradient(135deg, {{ $config['theme_color'] }} 0%, {{ $config['theme_color'] }}dd 100%);
-        color: white;
-        padding: 1rem;
-        transform: translateY(100%);
-        transition: transform 0.3s ease-in-out;
-        z-index: 9999;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
     }
 
     .pwa-install-banner.show {
-        transform: translateY(0);
+        @apply translate-y-0;
     }
 
     .pwa-install-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        max-width: 1200px;
-        margin: 0 auto;
-        gap: 1rem;
+        @apply flex items-center justify-between max-w-6xl mx-auto gap-4;
+        /* RTL/LTR support for content layout */
+        direction: inherit;
     }
 
     .pwa-install-text {
-        flex: 1;
+        @apply flex-1;
+        /* RTL/LTR text alignment */
+        text-align: start;
     }
 
     .pwa-install-title {
-        font-weight: bold;
-        margin-bottom: 0.25rem;
-        font-size: 1rem;
+        @apply font-bold mb-1 text-base;
     }
 
     .pwa-install-description {
-        font-size: 0.875rem;
-        opacity: 0.9;
+        @apply text-sm opacity-90;
     }
 
     .pwa-install-actions {
-        display: flex;
-        gap: 0.5rem;
-        flex-shrink: 0;
+        @apply flex gap-2 flex-shrink-0;
+        /* RTL/LTR support for action buttons */
+        direction: ltr;
     }
 
     .pwa-install-btn {
-        padding: 0.5rem 1rem;
-        border: 2px solid white;
-        background: transparent;
-        color: white;
-        border-radius: 0.375rem;
-        cursor: pointer;
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
+        @apply px-4 py-2 border-2 border-white bg-transparent text-white rounded-md cursor-pointer text-sm transition-all duration-200 no-underline inline-flex items-center gap-1;
     }
 
     .pwa-install-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        text-decoration: none;
+        @apply bg-white/10 text-white no-underline;
     }
 
     .pwa-install-btn.primary {
-        background: white;
+        @apply bg-white;
         color: {{ $config['theme_color'] }};
     }
 
     .pwa-install-btn.primary:hover {
-        background: rgba(255, 255, 255, 0.9);
+        @apply bg-white/90;
         color: {{ $config['theme_color'] }}dd;
     }
 
     .pwa-install-icon {
-        width: 1rem;
-        height: 1rem;
+        @apply w-4 h-4;
     }
 
-    /* Hide banner on very small screens */
+    /* Responsive design with RTL/LTR support */
     @media (max-width: 480px) {
         .pwa-install-content {
-            flex-direction: column;
-            text-align: center;
+            @apply flex-col text-center;
         }
-        
+
         .pwa-install-actions {
-            width: 100%;
-            justify-content: center;
+            @apply w-full justify-center;
         }
     }
 
@@ -175,17 +147,35 @@
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
-        
+
         /* Hide PWA install banner when already installed */
         .pwa-install-banner {
-            display: none !important;
+            @apply !hidden;
         }
     }
 
-    /* iOS Safari specific styles */
+    /* iOS Safari specific styles with RTL/LTR support */
     @supports (-webkit-touch-callout: none) {
         .pwa-install-banner {
             padding-bottom: calc(1rem + env(safe-area-inset-bottom));
         }
+    }
+
+    /* RTL-specific adjustments */
+    [dir="rtl"] .pwa-install-content {
+        @apply flex-row-reverse;
+    }
+
+    [dir="rtl"] .pwa-install-actions {
+        @apply flex-row-reverse;
+    }
+
+    /* LTR-specific adjustments (explicit for clarity) */
+    [dir="ltr"] .pwa-install-content {
+        @apply flex-row;
+    }
+
+    [dir="ltr"] .pwa-install-actions {
+        @apply flex-row;
     }
 </style>

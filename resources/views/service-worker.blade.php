@@ -182,69 +182,42 @@ async function handleFontRequest(request) {
   }
 }
 
-// Generate offline HTML fallback
+// Generate offline HTML fallback with Tailwind CSS and RTL/LTR support
 function getOfflineHTML() {
   return `
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="en" dir="ltr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Offline - Admin Panel</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '{{ config('filament-pwa.theme_color', '#A77B56') }}'
+                        }
+                    }
+                }
+            }
+        </script>
         <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                margin: 0;
-                padding: 2rem;
-                background: #f8fafc;
-                color: #374151;
-                text-align: center;
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-direction: column;
-            }
-            .offline-container {
-                max-width: 400px;
-                background: white;
-                padding: 2rem;
-                border-radius: 1rem;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-            .offline-icon {
-                font-size: 4rem;
-                margin-bottom: 1rem;
-            }
-            h1 {
-                margin: 0 0 1rem 0;
-                color: #1f2937;
-            }
-            p {
-                margin: 0 0 1.5rem 0;
-                line-height: 1.6;
-            }
             .retry-btn {
                 background: {{ config('filament-pwa.theme_color', '#A77B56') }};
-                color: white;
-                border: none;
-                padding: 0.75rem 1.5rem;
-                border-radius: 0.5rem;
-                cursor: pointer;
-                font-size: 1rem;
-                transition: background 0.2s;
             }
             .retry-btn:hover {
                 background: {{ config('filament-pwa.theme_color', '#A77B56') }}dd;
             }
         </style>
     </head>
-    <body>
-        <div class="offline-container">
-            <div class="offline-icon">📱</div>
-            <h1>You're Offline</h1>
-            <p>It looks like you've lost your internet connection. Don't worry, you can still access some features of the admin panel.</p>
-            <button class="retry-btn" onclick="window.location.reload()">
+    <body class="font-sans m-0 p-8 bg-gray-50 text-gray-700 text-center min-h-screen flex items-center justify-center flex-col">
+        <div class="max-w-sm bg-white p-8 rounded-2xl shadow-lg">
+            <div class="text-6xl mb-4">📱</div>
+            <h1 class="m-0 mb-4 text-gray-800 text-xl font-semibold">You're Offline</h1>
+            <p class="m-0 mb-6 leading-relaxed text-gray-600">It looks like you've lost your internet connection. Don't worry, you can still access some features of the admin panel.</p>
+            <button class="retry-btn text-white border-none px-6 py-3 rounded-lg cursor-pointer text-base transition-colors duration-200 hover:opacity-90" onclick="window.location.reload()">
                 Try Again
             </button>
         </div>

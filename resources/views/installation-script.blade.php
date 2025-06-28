@@ -243,12 +243,14 @@ class PWAInstaller {
     }
 
     showUpdateAvailable() {
-        // Show update notification
+        // Show update notification with RTL/LTR support
         const notification = document.createElement('div');
+        const isRTL = document.documentElement.dir === 'rtl';
+
         notification.style.cssText = `
             position: fixed;
             top: 1rem;
-            right: 1rem;
+            ${isRTL ? 'left' : 'right'}: 1rem;
             background: ${this.config.theme_color};
             color: white;
             padding: 1rem;
@@ -256,19 +258,22 @@ class PWAInstaller {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 10000;
             max-width: 300px;
+            direction: inherit;
         `;
 
         notification.innerHTML = `
             <div style="margin-bottom: 0.5rem; font-weight: bold;">{{ __('filament-pwa::pwa.update_available') }}</div>
             <div style="margin-bottom: 1rem; font-size: 0.875rem;">{{ __('filament-pwa::pwa.update_description') }}</div>
-            <button onclick="window.location.reload()" 
-                    style="background: white; color: ${this.config.theme_color}; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; margin-right: 0.5rem;">
-                {{ __('filament-pwa::pwa.update_now') }}
-            </button>
-            <button onclick="this.parentElement.remove()" 
-                    style="background: transparent; color: white; border: 1px solid white; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
-                {{ __('filament-pwa::pwa.update_later') }}
-            </button>
+            <div style="display: flex; gap: 0.5rem; ${isRTL ? 'flex-direction: row-reverse;' : ''}">
+                <button onclick="window.location.reload()"
+                        style="background: white; color: ${this.config.theme_color}; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
+                    {{ __('filament-pwa::pwa.update_now') }}
+                </button>
+                <button onclick="this.parentElement.remove()"
+                        style="background: transparent; color: white; border: 1px solid white; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
+                    {{ __('filament-pwa::pwa.update_later') }}
+                </button>
+            </div>
         `;
 
         document.body.appendChild(notification);
@@ -316,7 +321,7 @@ window.addEventListener('offline', () => {
     document.body.classList.add('offline');
 });
 
-// Add offline indicator styles
+// Add offline indicator styles with Tailwind CSS and RTL/LTR support
 const offlineStyles = document.createElement('style');
 offlineStyles.textContent = `
     .offline::before {
@@ -331,10 +336,20 @@ offlineStyles.textContent = `
         padding: 0.5rem;
         z-index: 9999;
         font-size: 0.875rem;
+        direction: inherit;
     }
-    
+
     .offline {
         padding-top: 2.5rem !important;
+    }
+
+    /* RTL/LTR support for offline indicator */
+    [dir="rtl"] .offline::before {
+        text-align: center;
+    }
+
+    [dir="ltr"] .offline::before {
+        text-align: center;
     }
 `;
 document.head.appendChild(offlineStyles);
