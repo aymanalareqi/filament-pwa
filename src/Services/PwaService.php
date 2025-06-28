@@ -69,7 +69,7 @@ class PwaService
     /**
      * Evaluate a configuration value, executing closures if present
      *
-     * @param mixed $value The configuration value (could be a closure)
+     * @param  mixed  $value  The configuration value (could be a closure)
      * @return mixed The evaluated value
      */
     protected static function evaluateConfigValue(mixed $value): mixed
@@ -84,7 +84,7 @@ class PwaService
     /**
      * Evaluate shortcuts array, handling closures for dynamic shortcuts
      *
-     * @param array $shortcuts The shortcuts configuration
+     * @param  array  $shortcuts  The shortcuts configuration
      * @return array The evaluated shortcuts
      */
     protected static function evaluateShortcuts(array $shortcuts): array

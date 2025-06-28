@@ -24,13 +24,13 @@ class FilamentPwaPlugin implements Plugin
         // Register PWA meta tags in the head
         $panel->renderHook(
             PanelsRenderHook::HEAD_START,
-            fn(): string => PwaService::getMetaTags($mergedConfig)
+            fn (): string => PwaService::getMetaTags($mergedConfig)
         );
 
         // Register PWA installation script at the end of body
         $panel->renderHook(
             PanelsRenderHook::BODY_END,
-            fn(): string => PwaService::getInstallationScript($mergedConfig)
+            fn (): string => PwaService::getInstallationScript($mergedConfig)
         );
     }
 
@@ -55,7 +55,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA app name
      *
-     * @param string|\Closure $name The app name or a closure that returns the app name
+     * @param  string|\Closure  $name  The app name or a closure that returns the app name
      */
     public function name(string|\Closure $name): static
     {
@@ -67,7 +67,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA app name (alias for name method)
      *
-     * @param string|\Closure $name The app name or a closure that returns the app name
+     * @param  string|\Closure  $name  The app name or a closure that returns the app name
      */
     public function appName(string|\Closure $name): static
     {
@@ -77,7 +77,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA short name
      *
-     * @param string|\Closure $shortName The short name or a closure that returns the short name
+     * @param  string|\Closure  $shortName  The short name or a closure that returns the short name
      */
     public function shortName(string|\Closure $shortName): static
     {
@@ -89,7 +89,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA description
      *
-     * @param string|\Closure $description The description or a closure that returns the description
+     * @param  string|\Closure  $description  The description or a closure that returns the description
      */
     public function description(string|\Closure $description): static
     {
@@ -101,7 +101,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA start URL
      *
-     * @param string|\Closure $startUrl The start URL or a closure that returns the start URL
+     * @param  string|\Closure  $startUrl  The start URL or a closure that returns the start URL
      */
     public function startUrl(string|\Closure $startUrl): static
     {
@@ -113,7 +113,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA theme color
      *
-     * @param string|\Closure $themeColor The theme color or a closure that returns the theme color
+     * @param  string|\Closure  $themeColor  The theme color or a closure that returns the theme color
      */
     public function themeColor(string|\Closure $themeColor): static
     {
@@ -125,7 +125,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA background color
      *
-     * @param string|\Closure $backgroundColor The background color or a closure that returns the background color
+     * @param  string|\Closure  $backgroundColor  The background color or a closure that returns the background color
      */
     public function backgroundColor(string|\Closure $backgroundColor): static
     {
@@ -201,7 +201,7 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure the PWA language
      *
-     * @param string|\Closure $language The language code or a closure that returns the language code
+     * @param  string|\Closure  $language  The language code or a closure that returns the language code
      */
     public function language(string|\Closure $language): static
     {
@@ -214,7 +214,7 @@ class FilamentPwaPlugin implements Plugin
      * Configure the PWA text direction
      * Available directions: ltr, rtl
      *
-     * @param string|\Closure $direction The text direction or a closure that returns the text direction
+     * @param  string|\Closure  $direction  The text direction or a closure that returns the text direction
      */
     public function direction(string|\Closure $direction): static
     {
@@ -325,14 +325,14 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Add a shortcut to the PWA
      *
-     * @param string|\Closure $name The shortcut name or a closure that returns shortcut data
-     * @param string|\Closure|null $url The URL or a closure that returns the URL (ignored if $name is a closure)
-     * @param string|\Closure|null $description The description or a closure that returns the description (ignored if $name is a closure)
-     * @param array|\Closure $icons The icons array or a closure that returns the icons (ignored if $name is a closure)
+     * @param  string|\Closure  $name  The shortcut name or a closure that returns shortcut data
+     * @param  string|\Closure|null  $url  The URL or a closure that returns the URL (ignored if $name is a closure)
+     * @param  string|\Closure|null  $description  The description or a closure that returns the description (ignored if $name is a closure)
+     * @param  array|\Closure  $icons  The icons array or a closure that returns the icons (ignored if $name is a closure)
      */
     public function addShortcut(string|\Closure $name, string|\Closure|null $url = null, string|\Closure|null $description = null, array|\Closure $icons = []): static
     {
-        if (!isset($this->config['shortcuts'])) {
+        if (! isset($this->config['shortcuts'])) {
             $this->config['shortcuts'] = [];
         }
 
@@ -357,8 +357,6 @@ class FilamentPwaPlugin implements Plugin
 
         return $this;
     }
-
-
 
     /**
      * Get the current configuration
