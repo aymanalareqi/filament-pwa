@@ -24,13 +24,13 @@ class FilamentPwaPlugin implements Plugin
         // Register PWA meta tags in the head
         $panel->renderHook(
             PanelsRenderHook::HEAD_START,
-            fn(): string => PwaService::getMetaTags($mergedConfig)
+            fn (): string => PwaService::getMetaTags($mergedConfig)
         );
 
         // Register PWA installation script at the end of body
         $panel->renderHook(
             PanelsRenderHook::BODY_END,
-            fn(): string => PwaService::getInstallationScript($mergedConfig)
+            fn (): string => PwaService::getInstallationScript($mergedConfig)
         );
     }
 
@@ -297,7 +297,7 @@ class FilamentPwaPlugin implements Plugin
      */
     public function enableDebugBanner(bool $enabled = true): static
     {
-        if (!isset($this->config['installation'])) {
+        if (! isset($this->config['installation'])) {
             $this->config['installation'] = [];
         }
 
