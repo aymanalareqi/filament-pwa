@@ -123,7 +123,7 @@ Please see [SECURITY.md](SECURITY.md) for details on reporting security vulnerab
 
 ## Credits
 
-- [Mohammed Al-Areqi](https://github.com/alareqi) - Creator and maintainer
+- [Ayman Alareqi](https://github.com/aymanalareqi) - Creator and maintainer
 - [Filament Team](https://filamentphp.com) - For the amazing admin panel framework
 - [Laravel Team](https://laravel.com) - For the excellent PHP framework
 - All contributors and community members

@@ -128,7 +128,7 @@ Add icon generation validation
 
 ## Issue Reporting
 
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/alareqi/filament-pwa/issues).
+We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/aymanalareqi/filament-pwa/issues).
 
 ### Bug Reports
 

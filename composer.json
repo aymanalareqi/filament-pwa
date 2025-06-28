@@ -11,10 +11,10 @@
         "service-worker",
         "manifest"
     ],
-    "homepage": "https://github.com/alareqi/filament-pwa",
+    "homepage": "https://github.com/aymanalareqi/filament-pwa",
     "support": {
-        "issues": "https://github.com/alareqi/filament-pwa/issues",
-        "source": "https://github.com/alareqi/filament-pwa"
+        "issues": "https://github.com/aymanalareqi/filament-pwa/issues",
+        "source": "https://github.com/aymanalareqi/filament-pwa"
     },
     "license": "MIT",
     "authors": [

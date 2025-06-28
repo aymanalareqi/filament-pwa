@@ -1,8 +1,8 @@
 # Filament PWA Plugin
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/alareqi/filament-pwa.svg?style=flat-square)](https://packagist.org/packages/alareqi/filament-pwa)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/alareqi/filament-pwa/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/alareqi/filament-pwa/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/alareqi/filament-pwa/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/alareqi/filament-pwa/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/alareqi/filament-pwa/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/aymanalareqi/filament-pwa/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/alareqi/filament-pwa/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/aymanalareqi/filament-pwa/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/alareqi/filament-pwa.svg?style=flat-square)](https://packagist.org/packages/alareqi/filament-pwa)
 
 A comprehensive Progressive Web App (PWA) plugin for Filament v3 admin panels. Transform your Filament admin panel into a fully-featured PWA with offline functionality, installation prompts, automatic icon generation, and more.
@@ -177,7 +177,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Mohammed Al-Areqi](https://github.com/alareqi)
+- [Ayman Alareqi](https://github.com/aymanalareqi)
 - [All Contributors](../../contributors)
 
 ## License
