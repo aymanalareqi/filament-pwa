@@ -64,7 +64,7 @@ class FilamentPwaSetupCommand extends Command
     {
         $this->info('📱 Generating PWA icons...');
 
-        $sourcePath = $this->option('source') ?: config('filament-pwa.icons.source_path', 'icon.svg');
+        $sourcePath = $this->option('source') ?: config('filament-pwa.icons.source_path', 'icon.png');
 
         if (! str_starts_with($sourcePath, '/')) {
             $sourcePath = public_path($sourcePath);
