@@ -323,7 +323,7 @@ class FilamentPwaSetupCommand extends Command
         // If route exists, try to get content to check caching strategy
         if ($swRouteExists) {
             try {
-                $controller = new \Alareqi\FilamentPwa\Http\Controllers\PwaController();
+                $controller = new \Alareqi\FilamentPwa\Http\Controllers\PwaController;
                 $response = $controller->serviceWorker();
                 $content = $response->getContent();
 
@@ -360,7 +360,7 @@ class FilamentPwaSetupCommand extends Command
         // If route exists, try to get content to validate manifest structure
         if ($manifestRouteExists) {
             try {
-                $controller = new \Alareqi\FilamentPwa\Http\Controllers\PwaController();
+                $controller = new \Alareqi\FilamentPwa\Http\Controllers\PwaController;
                 $response = $controller->manifest();
                 $manifest = $response->getData(true);
 

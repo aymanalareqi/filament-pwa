@@ -419,11 +419,11 @@ class PwaService
             }
         }
 
-        if (!$manifestRouteExists) {
+        if (! $manifestRouteExists) {
             $errors[] = 'Manifest file not found';
         }
 
-        if (!$swRouteExists) {
+        if (! $swRouteExists) {
             $errors[] = 'Service worker not found';
         }
 
