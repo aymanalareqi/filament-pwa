@@ -1,0 +1,12 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "simplified_null_return": true,
+        "braces": {
+            "position_after_control_structures": "same"
+        },
+        "concat_space": {
+            "spacing": "one"
+        }
+    }
+}
