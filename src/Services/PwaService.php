@@ -211,7 +211,7 @@ class PwaService
      */
     protected static function extractPrimaryColor(array $colors): ?string
     {
-        if (!isset($colors['primary'])) {
+        if (! isset($colors['primary'])) {
             return null;
         }
 
@@ -223,6 +223,7 @@ class PwaService
             if (preg_match('/^#[0-9a-f]{6}$/i', $primary)) {
                 return $primary;
             }
+
             // If it's a named color or other format, try to convert
             return $primary;
         }
@@ -242,9 +243,9 @@ class PwaService
                             if (count($rgbValues) === 3) {
                                 return sprintf(
                                     '#%02x%02x%02x',
-                                    (int)$rgbValues[0],
-                                    (int)$rgbValues[1],
-                                    (int)$rgbValues[2]
+                                    (int) $rgbValues[0],
+                                    (int) $rgbValues[1],
+                                    (int) $rgbValues[2]
                                 );
                             }
                         }
@@ -319,6 +320,7 @@ class PwaService
         try {
             $locale = app()->getLocale();
             $rtlLocales = ['ar', 'he', 'fa', 'ur', 'ku', 'dv', 'ps', 'sd', 'yi'];
+
             return in_array($locale, $rtlLocales) ? 'rtl' : 'ltr';
         } catch (\Exception $e) {
             return 'ltr';
