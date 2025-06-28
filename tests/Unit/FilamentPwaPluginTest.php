@@ -277,10 +277,10 @@ class FilamentPwaPluginTest extends TestCase
     public function it_supports_closure_based_configuration()
     {
         $plugin = FilamentPwaPlugin::make()
-            ->name(fn() => 'Dynamic App Name')
-            ->themeColor(fn() => '#FF0000')
-            ->language(fn() => 'ar')
-            ->direction(fn() => 'rtl');
+            ->name(fn () => 'Dynamic App Name')
+            ->themeColor(fn () => '#FF0000')
+            ->language(fn () => 'ar')
+            ->direction(fn () => 'rtl');
 
         $config = $plugin->getConfig();
 
