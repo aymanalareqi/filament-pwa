@@ -44,6 +44,10 @@ class PwaService
     {
         $config = array_merge(self::getDefaultConfig(), config('filament-pwa', []), $overrides);
 
+        // Extract current panel if provided
+        $currentPanel = $config['_current_panel'] ?? null;
+        unset($config['_current_panel']); // Remove from final config
+
         return [
             'name' => self::evaluateConfigValue($config['name'] ?? $config['app_name'] ?? $config['name']), // Support both old and new keys
             'short_name' => self::evaluateConfigValue($config['short_name']),
@@ -51,7 +55,7 @@ class PwaService
             'start_url' => self::evaluateConfigValue($config['start_url']),
             'display' => self::evaluateConfigValue($config['display']),
             'background_color' => self::evaluateConfigValue($config['background_color']),
-            'theme_color' => self::evaluateConfigValue($config['theme_color'] ?? self::getDefaultThemeColor()),
+            'theme_color' => self::evaluateConfigValue($config['theme_color'] ?? self::getDefaultThemeColor($currentPanel)),
             'orientation' => self::evaluateConfigValue($config['orientation']),
             'scope' => self::evaluateConfigValue($config['scope']),
             'lang' => self::evaluateConfigValue($config['lang'] ?? self::getDefaultLanguage()),
@@ -157,41 +161,65 @@ class PwaService
     /**
      * Get default theme color from Filament or fallback
      */
-    protected static function getDefaultThemeColor(): string
+    protected static function getDefaultThemeColor($currentPanel = null): string
     {
         try {
-            // Method 1: Try to get from Filament Facades
+            // Method 1: Try to get from provided panel context (highest priority)
+            if ($currentPanel) {
+                $primaryColor = self::extractColorFromPanel($currentPanel);
+                if ($primaryColor) {
+                    return $primaryColor;
+                }
+            }
+
+            // Method 2: Try to get from current panel context (runtime detection)
+            $detectedPanel = self::getCurrentPanel();
+            if ($detectedPanel) {
+                $primaryColor = self::extractColorFromPanel($detectedPanel);
+                if ($primaryColor) {
+                    return $primaryColor;
+                }
+            }
+
+            // Method 3: Try to get from Filament Facades (all panels)
             if (class_exists(\Filament\Facades\Filament::class)) {
                 $panels = \Filament\Facades\Filament::getPanels();
-                $adminPanel = $panels['admin'] ?? collect($panels)->first();
 
-                if ($adminPanel && method_exists($adminPanel, 'getColors')) {
-                    $colors = $adminPanel->getColors();
-                    $primaryColor = self::extractPrimaryColor($colors);
+                // Try to find admin panel first, then any panel
+                $targetPanel = $panels['admin'] ?? collect($panels)->first();
+
+                if ($targetPanel) {
+                    $primaryColor = self::extractColorFromPanel($targetPanel);
                     if ($primaryColor) {
                         return $primaryColor;
                     }
                 }
             }
 
-            // Method 2: Try to get from PanelManager directly
+            // Method 4: Try to get from PanelManager directly
             if (class_exists(\Filament\PanelManager::class)) {
                 $panelManager = app(\Filament\PanelManager::class);
                 $panels = $panelManager->getPanels();
-                $adminPanel = $panels['admin'] ?? collect($panels)->first();
 
-                if ($adminPanel && method_exists($adminPanel, 'getColors')) {
-                    $colors = $adminPanel->getColors();
-                    $primaryColor = self::extractPrimaryColor($colors);
+                $targetPanel = $panels['admin'] ?? collect($panels)->first();
+
+                if ($targetPanel) {
+                    $primaryColor = self::extractColorFromPanel($targetPanel);
                     if ($primaryColor) {
                         return $primaryColor;
                     }
                 }
             }
 
-            // Method 3: Try to get from Filament config if available
-            if (function_exists('config')) {
-                $filamentConfig = config('filament.theme.colors.primary');
+            // Method 5: Try to get from Filament config files
+            $configPaths = [
+                'filament.theme.colors.primary',
+                'filament.colors.primary',
+                'filament.default.colors.primary'
+            ];
+
+            foreach ($configPaths as $configPath) {
+                $filamentConfig = config($configPath);
                 if ($filamentConfig) {
                     $primaryColor = self::extractPrimaryColor(['primary' => $filamentConfig]);
                     if ($primaryColor) {
@@ -200,10 +228,81 @@ class PwaService
                 }
             }
         } catch (\Exception $e) {
-            // Silently fall back to default if Filament is not available
+            // Log the error for debugging but continue with fallback
+            if (config('app.debug')) {
+                \Log::warning('PWA color detection failed: ' . $e->getMessage());
+            }
         }
 
         return '#6366f1'; // Tailwind Indigo 500 (Filament's default)
+    }
+
+    /**
+     * Get the current active Filament panel
+     */
+    protected static function getCurrentPanel()
+    {
+        try {
+            // Method 1: Try to get current panel from Filament facade
+            if (class_exists(\Filament\Facades\Filament::class)) {
+                $currentPanel = \Filament\Facades\Filament::getCurrentPanel();
+                if ($currentPanel) {
+                    return $currentPanel;
+                }
+            }
+
+            // Method 2: Try to detect from current route
+            $currentRoute = request()->route();
+            if ($currentRoute) {
+                $routeName = $currentRoute->getName();
+                if ($routeName && str_contains($routeName, 'filament.')) {
+                    // Extract panel ID from route name (e.g., 'filament.admin.pages.dashboard')
+                    $parts = explode('.', $routeName);
+                    if (count($parts) >= 2 && $parts[0] === 'filament') {
+                        $panelId = $parts[1];
+
+                        if (class_exists(\Filament\Facades\Filament::class)) {
+                            $panels = \Filament\Facades\Filament::getPanels();
+                            if (isset($panels[$panelId])) {
+                                return $panels[$panelId];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Method 3: Try to get from request path
+            $path = request()->path();
+            if (str_starts_with($path, 'admin')) {
+                if (class_exists(\Filament\Facades\Filament::class)) {
+                    $panels = \Filament\Facades\Filament::getPanels();
+                    if (isset($panels['admin'])) {
+                        return $panels['admin'];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Continue to fallback methods
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract color from a Filament panel instance
+     */
+    protected static function extractColorFromPanel($panel): ?string
+    {
+        try {
+            if (!$panel || !method_exists($panel, 'getColors')) {
+                return null;
+            }
+
+            $colors = $panel->getColors();
+            return self::extractPrimaryColor($colors);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -217,45 +316,127 @@ class PwaService
 
         $primary = $colors['primary'];
 
-        // Handle string colors (hex, rgb, etc.)
-        if (is_string($primary)) {
-            // If it's already a hex color, return it
-            if (preg_match('/^#[0-9a-f]{6}$/i', $primary)) {
-                return $primary;
+        // Handle Filament Color objects (v4 compatibility)
+        if (is_object($primary)) {
+            // Try to get the color value from Filament Color object
+            if (method_exists($primary, 'getColor')) {
+                $colorValue = $primary->getColor();
+                if (is_string($colorValue)) {
+                    return self::normalizeColorValue($colorValue);
+                }
             }
 
-            // If it's a named color or other format, try to convert
-            return $primary;
+            // Try to get array representation
+            if (method_exists($primary, 'toArray')) {
+                $colorArray = $primary->toArray();
+                if (is_array($colorArray)) {
+                    return self::extractFromColorArray($colorArray);
+                }
+            }
+
+            // Try to convert to string
+            if (method_exists($primary, '__toString')) {
+                $colorString = (string) $primary;
+                return self::normalizeColorValue($colorString);
+            }
+        }
+
+        // Handle string colors (hex, rgb, etc.)
+        if (is_string($primary)) {
+            return self::normalizeColorValue($primary);
         }
 
         // Handle array colors (Filament Color class format)
         if (is_array($primary)) {
-            // Try different shades in order of preference
-            $preferredShades = [600, 500, 700, 400, 800, 300, 900, 200, 100, 50];
+            return self::extractFromColorArray($primary);
+        }
 
-            foreach ($preferredShades as $shade) {
-                if (isset($primary[$shade])) {
-                    $rgb = $primary[$shade];
-                    if (is_string($rgb)) {
-                        // Handle "r, g, b" format
-                        if (strpos($rgb, ',') !== false) {
-                            $rgbValues = array_map('trim', explode(',', $rgb));
-                            if (count($rgbValues) === 3) {
-                                return sprintf(
-                                    '#%02x%02x%02x',
-                                    (int) $rgbValues[0],
-                                    (int) $rgbValues[1],
-                                    (int) $rgbValues[2]
-                                );
-                            }
-                        }
-                        // Handle hex format
-                        if (preg_match('/^#?[0-9a-f]{6}$/i', $rgb)) {
-                            return strpos($rgb, '#') === 0 ? $rgb : '#' . $rgb;
-                        }
+        return null;
+    }
+
+    /**
+     * Extract color from color array (shade-based)
+     */
+    protected static function extractFromColorArray(array $colorArray): ?string
+    {
+        // Try different shades in order of preference
+        $preferredShades = [600, 500, 700, 400, 800, 300, 900, 200, 100, 50];
+
+        foreach ($preferredShades as $shade) {
+            if (isset($colorArray[$shade])) {
+                $rgb = $colorArray[$shade];
+                if (is_string($rgb)) {
+                    $normalized = self::normalizeColorValue($rgb);
+                    if ($normalized) {
+                        return $normalized;
                     }
                 }
             }
+        }
+
+        // If no shade-based color found, try direct color values
+        foreach ($colorArray as $key => $value) {
+            if (is_string($value)) {
+                $normalized = self::normalizeColorValue($value);
+                if ($normalized) {
+                    return $normalized;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Normalize color value to hex format
+     */
+    protected static function normalizeColorValue(string $color): ?string
+    {
+        $color = trim($color);
+
+        // If it's already a hex color, return it
+        if (preg_match('/^#[0-9a-f]{6}$/i', $color)) {
+            return $color;
+        }
+
+        // If it's hex without #, add it
+        if (preg_match('/^[0-9a-f]{6}$/i', $color)) {
+            return '#' . $color;
+        }
+
+        // Handle "r, g, b" format
+        if (strpos($color, ',') !== false) {
+            $rgbValues = array_map('trim', explode(',', $color));
+            if (count($rgbValues) === 3) {
+                $r = (int) $rgbValues[0];
+                $g = (int) $rgbValues[1];
+                $b = (int) $rgbValues[2];
+
+                // Validate RGB values
+                if ($r >= 0 && $r <= 255 && $g >= 0 && $g <= 255 && $b >= 0 && $b <= 255) {
+                    return sprintf('#%02x%02x%02x', $r, $g, $b);
+                }
+            }
+        }
+
+        // Handle rgb() format
+        if (preg_match('/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i', $color, $matches)) {
+            $r = (int) $matches[1];
+            $g = (int) $matches[2];
+            $b = (int) $matches[3];
+
+            if ($r >= 0 && $r <= 255 && $g >= 0 && $g <= 255 && $b >= 0 && $b <= 255) {
+                return sprintf('#%02x%02x%02x', $r, $g, $b);
+            }
+        }
+
+        // For other formats, return as-is if it looks like a valid color
+        if (preg_match('/^#[0-9a-f]{3}$/i', $color)) {
+            // Convert 3-digit hex to 6-digit
+            $r = $color[1] . $color[1];
+            $g = $color[2] . $color[2];
+            $b = $color[3] . $color[3];
+            return '#' . $r . $g . $b;
         }
 
         return null;
@@ -272,29 +453,76 @@ class PwaService
             'env_theme_color' => env('PWA_THEME_COLOR'),
             'detected_theme_color' => null,
             'filament_available' => false,
+            'current_panel' => null,
+            'current_panel_colors' => null,
             'panels_found' => [],
             'colors_found' => [],
+            'color_extraction_steps' => [],
             'final_config' => null,
         ];
 
         try {
+            // Check current panel
+            $currentPanel = self::getCurrentPanel();
+            if ($currentPanel) {
+                $debug['current_panel'] = [
+                    'id' => method_exists($currentPanel, 'getId') ? $currentPanel->getId() : 'unknown',
+                    'class' => get_class($currentPanel),
+                ];
+
+                if (method_exists($currentPanel, 'getColors')) {
+                    $debug['current_panel_colors'] = $currentPanel->getColors();
+                    $extractedColor = self::extractColorFromPanel($currentPanel);
+                    $debug['color_extraction_steps'][] = [
+                        'method' => 'current_panel',
+                        'result' => $extractedColor,
+                        'raw_colors' => $currentPanel->getColors(),
+                    ];
+                }
+            }
+
             // Check if Filament is available
             if (class_exists(\Filament\Facades\Filament::class)) {
                 $debug['filament_available'] = true;
                 $panels = \Filament\Facades\Filament::getPanels();
                 $debug['panels_found'] = array_keys($panels);
 
-                $adminPanel = $panels['admin'] ?? collect($panels)->first();
-                if ($adminPanel && method_exists($adminPanel, 'getColors')) {
-                    $colors = $adminPanel->getColors();
-                    $debug['colors_found'] = $colors;
+                foreach ($panels as $panelId => $panel) {
+                    if (method_exists($panel, 'getColors')) {
+                        $colors = $panel->getColors();
+                        $debug['colors_found'][$panelId] = $colors;
+
+                        $extractedColor = self::extractColorFromPanel($panel);
+                        $debug['color_extraction_steps'][] = [
+                            'method' => "panel_{$panelId}",
+                            'result' => $extractedColor,
+                            'raw_colors' => $colors,
+                        ];
+                    }
                 }
+            }
+
+            // Test config paths
+            $configPaths = [
+                'filament.theme.colors.primary',
+                'filament.colors.primary',
+                'filament.default.colors.primary'
+            ];
+
+            foreach ($configPaths as $configPath) {
+                $configValue = config($configPath);
+                $debug['color_extraction_steps'][] = [
+                    'method' => "config_{$configPath}",
+                    'result' => $configValue ? self::extractPrimaryColor(['primary' => $configValue]) : null,
+                    'raw_value' => $configValue,
+                ];
             }
 
             $debug['detected_theme_color'] = self::getDefaultThemeColor();
             $debug['final_config'] = self::getConfig();
         } catch (\Exception $e) {
             $debug['error'] = $e->getMessage();
+            $debug['trace'] = $e->getTraceAsString();
         }
 
         return $debug;

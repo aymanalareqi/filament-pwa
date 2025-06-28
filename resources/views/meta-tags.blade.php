@@ -68,75 +68,121 @@
       media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" 
       href="{{ asset('images/splash/ipad-pro-12.png') }}">
 
-{{-- PWA Installation Styles with Tailwind CSS and RTL/LTR Support --}}
+{{-- PWA Installation Styles with Tailwind CSS v4 compatibility and RTL/LTR Support --}}
 <style>
-    /* PWA Installation Banner - Using Tailwind-compatible classes with RTL/LTR support */
+    /* PWA Installation Banner - Compatible with Tailwind CSS v4 */
     .pwa-install-banner {
-        @apply fixed bottom-0 inset-x-0 text-white p-4 transform translate-y-full transition-transform duration-300 ease-in-out z-[9999] shadow-2xl;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: white;
+        padding: 1rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15), 0 -10px 40px rgba(0, 0, 0, 0.1);
         background: linear-gradient(135deg, {{ $config['theme_color'] }} 0%, {{ $config['theme_color'] }}dd 100%);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
     }
 
     .pwa-install-banner.show {
-        @apply translate-y-0;
+        transform: translateY(0);
     }
 
     .pwa-install-content {
-        @apply flex items-center justify-between max-w-6xl mx-auto gap-4;
-        /* RTL/LTR support for content layout */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 72rem;
+        margin: 0 auto;
+        gap: 1rem;
         direction: inherit;
     }
 
     .pwa-install-text {
-        @apply flex-1;
-        /* RTL/LTR text alignment */
+        flex: 1;
         text-align: start;
     }
 
     .pwa-install-title {
-        @apply font-bold mb-1 text-base;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
     }
 
     .pwa-install-description {
-        @apply text-sm opacity-90;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        opacity: 0.9;
     }
 
     .pwa-install-actions {
-        @apply flex gap-2 flex-shrink-0;
-        /* RTL/LTR support for action buttons */
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
         direction: ltr;
     }
 
     .pwa-install-btn {
-        @apply px-4 py-2 border-2 border-white bg-transparent text-white rounded-md cursor-pointer text-sm transition-all duration-200 no-underline inline-flex items-center gap-1;
+        padding: 0.5rem 1rem;
+        border: 2px solid white;
+        background: transparent;
+        color: white;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-weight: 500;
     }
 
     .pwa-install-btn:hover {
-        @apply bg-white/10 text-white no-underline;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
     }
 
     .pwa-install-btn.primary {
-        @apply bg-white;
+        background: white;
         color: {{ $config['theme_color'] }};
+        border-color: white;
     }
 
     .pwa-install-btn.primary:hover {
-        @apply bg-white/90;
-        color: {{ $config['theme_color'] }}dd;
+        background: rgba(255, 255, 255, 0.9);
+        color: {{ $config['theme_color'] }};
+        transform: translateY(-1px);
     }
 
     .pwa-install-icon {
-        @apply w-4 h-4;
+        width: 1rem;
+        height: 1rem;
+        flex-shrink: 0;
     }
 
     /* Responsive design with RTL/LTR support */
     @media (max-width: 480px) {
         .pwa-install-content {
-            @apply flex-col text-center;
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
         }
 
         .pwa-install-actions {
-            @apply w-full justify-center;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pwa-install-btn {
+            flex: 1;
+            justify-content: center;
         }
     }
 
@@ -150,7 +196,7 @@
 
         /* Hide PWA install banner when already installed */
         .pwa-install-banner {
-            @apply !hidden;
+            display: none !important;
         }
     }
 
@@ -163,19 +209,79 @@
 
     /* RTL-specific adjustments */
     [dir="rtl"] .pwa-install-content {
-        @apply flex-row-reverse;
+        flex-direction: row-reverse;
     }
 
     [dir="rtl"] .pwa-install-actions {
-        @apply flex-row-reverse;
+        flex-direction: row-reverse;
     }
 
     /* LTR-specific adjustments (explicit for clarity) */
     [dir="ltr"] .pwa-install-content {
-        @apply flex-row;
+        flex-direction: row;
     }
 
     [dir="ltr"] .pwa-install-actions {
-        @apply flex-row;
+        flex-direction: row;
+    }
+
+    /* Enhanced visual improvements for better UX */
+    .pwa-install-banner {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .pwa-install-btn:focus {
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 2px;
+    }
+
+    .pwa-install-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Dark mode compatibility */
+    @media (prefers-color-scheme: dark) {
+        .pwa-install-banner {
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3), 0 -10px 40px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    /* Filament v4 compatibility - ensure proper z-index stacking */
+    .pwa-install-banner {
+        z-index: 99999;
+    }
+
+    /* Ensure banner works with Filament's layout */
+    .fi-layout .pwa-install-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    /* Animation improvements for smoother transitions */
+    .pwa-install-banner {
+        will-change: transform;
+    }
+
+    .pwa-install-banner.show {
+        animation: slideUp 0.3s ease-out forwards;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Ensure proper text rendering */
+    .pwa-install-banner * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 </style>

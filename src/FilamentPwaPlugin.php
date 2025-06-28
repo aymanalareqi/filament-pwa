@@ -18,19 +18,34 @@ class FilamentPwaPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        // Merge plugin config with global config
-        $mergedConfig = array_merge(config('filament-pwa', []), $this->config);
-
         // Register PWA meta tags in the head
         $panel->renderHook(
             PanelsRenderHook::HEAD_START,
-            fn (): string => PwaService::getMetaTags($mergedConfig)
+            function () use ($panel): string {
+                // Merge plugin config with global config and add panel context
+                $mergedConfig = array_merge(
+                    config('filament-pwa', []),
+                    $this->config,
+                    ['_current_panel' => $panel] // Pass current panel for runtime color detection
+                );
+
+                return PwaService::getMetaTags($mergedConfig);
+            }
         );
 
         // Register PWA installation script at the end of body
         $panel->renderHook(
             PanelsRenderHook::BODY_END,
-            fn (): string => PwaService::getInstallationScript($mergedConfig)
+            function () use ($panel): string {
+                // Merge plugin config with global config and add panel context
+                $mergedConfig = array_merge(
+                    config('filament-pwa', []),
+                    $this->config,
+                    ['_current_panel' => $panel] // Pass current panel for runtime color detection
+                );
+
+                return PwaService::getInstallationScript($mergedConfig);
+            }
         );
     }
 

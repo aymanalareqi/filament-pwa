@@ -249,18 +249,21 @@ class PWAInstaller {
         `;
 
         modal.innerHTML = `
-            <div style="background: white; border-radius: 1rem; padding: 2rem; max-width: 400px; text-align: center; direction: ${this.config.dir || 'ltr'};">
-                <h3 style="margin: 0 0 1rem 0; color: ${this.config.theme_color};">{{ __('filament-pwa::pwa.ios_install_title') }}</h3>
-                <p style="margin: 0 0 1.5rem 0; color: #666; line-height: 1.5;">
+            <div style="background: white; border-radius: 1rem; padding: 2rem; max-width: 400px; text-align: center; direction: ${this.config.dir || 'ltr'}; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid rgba(0, 0, 0, 0.05);">
+                <div style="font-size: 3rem; margin-bottom: 1rem; line-height: 1;">📱</div>
+                <h3 style="margin: 0 0 1rem 0; color: ${this.config.theme_color}; font-size: 1.25rem; font-weight: 600; line-height: 1.5;">{{ __('filament-pwa::pwa.ios_install_title') }}</h3>
+                <p style="margin: 0 0 1.5rem 0; color: #6B7280; line-height: 1.6; font-size: 0.875rem;">
                     {{ __('filament-pwa::pwa.ios_install_description') }}
                 </p>
-                <ol style="text-align: ${this.config.dir === 'rtl' ? 'right' : 'left'}; color: #666; line-height: 1.8; margin: 0 0 1.5rem 0;">
-                    <li>{{ __('filament-pwa::pwa.ios_step_1') }} <span style="font-size: 1.2em;">⬆️</span></li>
-                    <li>{{ __('filament-pwa::pwa.ios_step_2') }}</li>
-                    <li>{{ __('filament-pwa::pwa.ios_step_3') }}</li>
+                <ol style="text-align: ${this.config.dir === 'rtl' ? 'right' : 'left'}; color: #6B7280; line-height: 1.8; margin: 0 0 1.5rem 0; padding-${this.config.dir === 'rtl' ? 'right' : 'left'}: 1.5rem; font-size: 0.875rem;">
+                    <li style="margin-bottom: 0.5rem;">{{ __('filament-pwa::pwa.ios_step_1') }} <span style="font-size: 1.2em;">⬆️</span></li>
+                    <li style="margin-bottom: 0.5rem;">{{ __('filament-pwa::pwa.ios_step_2') }}</li>
+                    <li style="margin-bottom: 0.5rem;">{{ __('filament-pwa::pwa.ios_step_3') }}</li>
                 </ol>
-                <button onclick="this.parentElement.parentElement.remove()" 
-                        style="background: ${this.config.theme_color}; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">
+                <button onclick="this.parentElement.parentElement.remove()"
+                        style="background: ${this.config.theme_color}; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s ease-in-out; font-size: 0.875rem;"
+                        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                     {{ __('filament-pwa::pwa.got_it') }}
                 </button>
             </div>
@@ -296,15 +299,19 @@ class PWAInstaller {
         `;
 
         notification.innerHTML = `
-            <div style="margin-bottom: 0.5rem; font-weight: bold;">{{ __('filament-pwa::pwa.update_available') }}</div>
-            <div style="margin-bottom: 1rem; font-size: 0.875rem;">{{ __('filament-pwa::pwa.update_description') }}</div>
+            <div style="margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem; line-height: 1.5;">{{ __('filament-pwa::pwa.update_available') }}</div>
+            <div style="margin-bottom: 1rem; font-size: 0.875rem; line-height: 1.5; opacity: 0.9;">{{ __('filament-pwa::pwa.update_description') }}</div>
             <div style="display: flex; gap: 0.5rem; ${isRTL ? 'flex-direction: row-reverse;' : ''}">
                 <button onclick="window.location.reload()"
-                        style="background: white; color: ${this.config.theme_color}; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
+                        style="background: white; color: ${this.config.theme_color}; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; transition: all 0.2s ease-in-out; font-size: 0.875rem;"
+                        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                     {{ __('filament-pwa::pwa.update_now') }}
                 </button>
-                <button onclick="this.parentElement.remove()"
-                        style="background: transparent; color: white; border: 1px solid white; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
+                <button onclick="this.parentElement.parentElement.remove()"
+                        style="background: transparent; color: white; border: 1px solid rgba(255,255,255,0.7); padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; transition: all 0.2s ease-in-out; font-size: 0.875rem;"
+                        onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'; this.style.borderColor='white'"
+                        onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='rgba(255,255,255,0.7)'">
                     {{ __('filament-pwa::pwa.update_later') }}
                 </button>
             </div>
@@ -355,7 +362,7 @@ window.addEventListener('offline', () => {
     document.body.classList.add('offline');
 });
 
-// Add offline indicator styles with Tailwind CSS and RTL/LTR support
+// Add offline indicator styles compatible with Tailwind CSS v4 and RTL/LTR support
 const offlineStyles = document.createElement('style');
 offlineStyles.textContent = `
     .offline::before {
@@ -370,11 +377,16 @@ offlineStyles.textContent = `
         padding: 0.5rem;
         z-index: 9999;
         font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 500;
         direction: inherit;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
     .offline {
         padding-top: 2.5rem !important;
+        transition: padding-top 0.3s ease-in-out;
     }
 
     /* RTL/LTR support for offline indicator */
@@ -384,6 +396,14 @@ offlineStyles.textContent = `
 
     [dir="ltr"] .offline::before {
         text-align: center;
+    }
+
+    /* Enhanced offline indicator for better visibility */
+    @media (prefers-color-scheme: dark) {
+        .offline::before {
+            background: #d97706;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
     }
 `;
 document.head.appendChild(offlineStyles);

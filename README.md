@@ -17,9 +17,9 @@ A comprehensive Progressive Web App (PWA) plugin for Filament v3 and v4 admin pa
 - 🌐 **Comprehensive Offline Support** - Advanced caching strategies, offline fallback pages, and sync capabilities
 - 🌍 **Full Internationalization** - Built-in translations for 10+ languages with RTL/LTR support
 - 🔧 **Highly Configurable** - Extensive configuration options with fluent API and closure-based dynamic configuration
-- 🎯 **Seamless Filament Integration** - Native integration with Filament panels using render hooks
+- 🎯 **Seamless Filament Integration** - Native integration with Filament v3 & v4 panels using render hooks
 - 📊 **Validation & Debug Tools** - Built-in PWA validation, testing commands, and debug mode
-- 🎨 **Smart Defaults** - Auto-detects theme colors, language, and text direction from Filament/Laravel configuration
+- 🎨 **Smart Defaults** - Advanced auto-detection of theme colors, language, and text direction from Filament/Laravel configuration
 - ⚡ **Performance Optimized** - Efficient caching strategies and minimal overhead
 
 ## 📋 Table of Contents
@@ -580,6 +580,59 @@ The plugin includes several performance optimizations:
 ],
 ```
 
+## 🎨 Automatic Color Detection
+
+The plugin automatically detects and uses your Filament panel's primary color for the PWA installation banner and other UI elements. The color detection system works with both Filament v3 and v4:
+
+### Detection Priority
+
+1. **Current Panel Context** - Colors from the active panel (highest priority)
+2. **Runtime Panel Detection** - Detected from current route/request context
+3. **Admin Panel** - Default admin panel colors
+4. **Any Available Panel** - First available panel colors
+5. **Configuration Files** - Filament config file colors
+6. **Fallback Color** - `#6366f1` (Tailwind Indigo 500)
+
+### Supported Color Formats
+
+The system handles various color formats used by Filament:
+
+```php
+// Hex colors
+'primary' => '#3B82F6'
+
+// RGB format
+'primary' => 'rgb(59, 130, 246)'
+
+// Comma-separated RGB
+'primary' => '59, 130, 246'
+
+// Filament Color arrays (v3/v4)
+'primary' => [
+    600 => '59, 130, 246',
+    500 => '#3B82F6',
+    // ... other shades
+]
+
+// Filament Color objects (v4)
+'primary' => Color::Blue
+```
+
+### Manual Override
+
+You can override the automatic detection:
+
+```php
+// In config/filament-pwa.php
+'theme_color' => '#FF6B35', // Your custom color
+
+// Or via environment
+PWA_THEME_COLOR=#FF6B35
+
+// Or via plugin configuration
+FilamentPwaPlugin::make()->themeColor('#FF6B35')
+```
+
 ## 🔧 Troubleshooting
 
 ### Common Issues
@@ -608,6 +661,17 @@ chmod 755 public/images/icons
 'service_worker' => [
     'cache_name' => 'my-app-v1.0.1',  // Increment version
 ],
+```
+
+**PWA banner styling broken in Filament v4:**
+```bash
+# Filament v4 uses Tailwind CSS v4 which has breaking changes
+# The plugin has been updated to be compatible with both Tailwind v3 and v4
+# Make sure you're using the latest version of the plugin
+
+# Clear any cached views
+php artisan view:clear
+php artisan config:clear
 ```
 
 **Validation shows "Manifest file not found" or "Service worker not found":**
@@ -656,6 +720,13 @@ use Alareqi\FilamentPwa\Services\PwaService;
 $debug = PwaService::debugColorDetection();
 dd($debug);
 ```
+
+The debug output includes:
+- Current panel detection and colors
+- All available panels and their color configurations
+- Color extraction steps and results
+- Final resolved theme color
+- Configuration sources and priorities
 
 ### Browser Developer Tools
 
