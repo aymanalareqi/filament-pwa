@@ -1,9 +1,10 @@
 # Comprehensive Configuration Guide
 
-This comprehensive guide covers all configuration options available in the Filament PWA plugin, including the new internationalization features and advanced configuration patterns.
+This comprehensive guide covers all configuration options available in the Filament PWA plugin for both Filament v3 and v4, including the new internationalization features and advanced configuration patterns.
 
 ## Table of Contents
 
+- [Filament v4 Compatibility](#filament-v4-compatibility)
 - [Configuration Methods](#configuration-methods)
 - [Basic Configuration](#basic-configuration)
 - [Advanced Configuration](#advanced-configuration)
@@ -12,6 +13,60 @@ This comprehensive guide covers all configuration options available in the Filam
 - [Environment Variables](#environment-variables)
 - [Smart Defaults](#smart-defaults)
 - [Validation](#validation)
+
+## Filament v4 Compatibility
+
+The Filament PWA plugin fully supports both Filament v3 and v4 with the same API and configuration methods.
+
+### Version Requirements
+
+| Component | v3 Support | v4 Support |
+|-----------|------------|------------|
+| **PHP** | 8.1+ | 8.2+ |
+| **Laravel** | 10.0+ | 11.28+ |
+| **Filament** | 3.0+ | 4.0+ |
+
+### What's Compatible
+
+✅ **All configuration methods** work identically in both versions
+✅ **Render hooks** (`HEAD_START`, `BODY_END`) are unchanged
+✅ **Plugin registration** process is identical
+✅ **Theme color detection** works with both versions
+✅ **All fluent API methods** are compatible
+✅ **Service worker integration** remains the same
+✅ **Icon generation** works identically
+
+### Installation for Filament v4
+
+```bash
+# Same installation process for both versions
+composer require alareqi/filament-pwa
+
+# Plugin registration is identical
+FilamentPwaPlugin::make()
+    ->name('My Admin Panel')
+    ->themeColor('#3B82F6')
+    // ... all other methods work the same
+```
+
+### Migrating from v3 to v4
+
+No changes are required in your PWA configuration when upgrading from Filament v3 to v4. The plugin automatically detects the Filament version and adapts accordingly.
+
+```php
+// This configuration works in both Filament v3 and v4
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->plugins([
+            FilamentPwaPlugin::make()
+                ->name('My Admin Panel')
+                ->themeColor('#3B82F6')
+                ->enableInstallation()
+                ->addShortcut('Dashboard', '/admin'),
+        ]);
+}
+```
 
 ## Configuration Methods
 

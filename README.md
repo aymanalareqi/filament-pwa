@@ -7,7 +7,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/alareqi/filament-pwa/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/aymanalareqi/filament-pwa/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/alareqi/filament-pwa.svg?style=flat-square)](https://packagist.org/packages/alareqi/filament-pwa)
 
-A comprehensive Progressive Web App (PWA) plugin for Filament v3 admin panels. Transform your Filament admin panel into a fully-featured PWA with offline functionality, installation prompts, automatic icon generation, and comprehensive internationalization support.
+A comprehensive Progressive Web App (PWA) plugin for Filament v3 and v4 admin panels. Transform your Filament admin panel into a fully-featured PWA with offline functionality, installation prompts, automatic icon generation, and comprehensive internationalization support.
 
 ## ✨ Features
 
@@ -24,6 +24,7 @@ A comprehensive Progressive Web App (PWA) plugin for Filament v3 admin panels. T
 
 ## 📋 Table of Contents
 
+- [Requirements](#-requirements)
 - [Installation & Setup](#-installation--setup)
 - [Quick Start](#-quick-start)
 - [Configuration](#-configuration)
@@ -34,6 +35,33 @@ A comprehensive Progressive Web App (PWA) plugin for Filament v3 admin panels. T
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
 
+## 📋 Requirements
+
+### System Requirements
+
+- **PHP**: 8.2 or higher
+- **Laravel**: 10.0 or higher
+- **Filament**: 3.0 or 4.0
+
+### Optional Dependencies
+
+- **Imagick Extension** (recommended) - For high-quality icon generation
+- **GD Extension** (fallback) - Basic image processing support
+- **Intervention Image** (optional) - Enhanced image processing capabilities
+
+### Browser Support
+
+- **Chrome/Chromium** - Full PWA support
+- **Firefox** - PWA support with some limitations
+- **Safari** - Limited PWA support, manual installation required on iOS
+- **Edge** - Full PWA support
+
+### Production Requirements
+
+- **HTTPS** - Required for PWA functionality in production
+- **Valid SSL Certificate** - For secure service worker registration
+- **Web Server** - Apache, Nginx, or similar with proper MIME type configuration
+
 ## 🚀 Installation & Setup
 
 ### Step 1: Install the Package
@@ -43,6 +71,8 @@ Install the package via Composer:
 ```bash
 composer require alareqi/filament-pwa
 ```
+
+> **Note**: This package supports both Filament v3 and v4. The installation process is identical for both versions.
 
 ### Step 2: Publish Assets (Optional)
 

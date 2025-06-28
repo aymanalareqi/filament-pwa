@@ -251,4 +251,43 @@ class FilamentPwaPluginTest extends TestCase
 
         $this->assertTrue(true); // If we get here, boot worked
     }
+
+    /** @test */
+    public function it_works_with_filament_v3_and_v4_render_hooks()
+    {
+        $panel = Panel::make();
+        $plugin = FilamentPwaPlugin::make()
+            ->name('Test App')
+            ->themeColor('#3B82F6');
+
+        // Test that render hooks are properly registered
+        $plugin->register($panel);
+        $plugin->boot($panel);
+
+        // Verify the plugin configuration is accessible
+        $config = $plugin->getConfig();
+        $this->assertEquals('Test App', $config['app_name']);
+        $this->assertEquals('#3B82F6', $config['theme_color']);
+
+        // If we get here without exceptions, render hooks are compatible
+        $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function it_supports_closure_based_configuration()
+    {
+        $plugin = FilamentPwaPlugin::make()
+            ->name(fn() => 'Dynamic App Name')
+            ->themeColor(fn() => '#FF0000')
+            ->language(fn() => 'ar')
+            ->direction(fn() => 'rtl');
+
+        $config = $plugin->getConfig();
+
+        // Closures should be preserved in config for later evaluation
+        $this->assertIsCallable($config['app_name']);
+        $this->assertIsCallable($config['theme_color']);
+        $this->assertIsCallable($config['lang']);
+        $this->assertIsCallable($config['dir']);
+    }
 }

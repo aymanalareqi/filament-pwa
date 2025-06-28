@@ -1,6 +1,6 @@
 {
     "name": "alareqi/filament-pwa",
-    "description": "A comprehensive PWA (Progressive Web App) plugin for Filament v3 admin panels with offline functionality, installation prompts, and icon generation.",
+    "description": "A comprehensive PWA (Progressive Web App) plugin for Filament v3 and v4 admin panels with offline functionality, installation prompts, and icon generation.",
     "keywords": [
         "filament",
         "pwa",
@@ -25,8 +25,8 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "filament/filament": "^3.0",
+        "php": "^8.2",
+        "filament/filament": "^3.0|^4.0",
         "illuminate/contracts": "^10.0|^11.0|^12.0",
         "spatie/laravel-package-tools": "^1.15.0"
     },

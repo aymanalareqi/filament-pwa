@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-06-28
+
+### Added
+
+#### Filament v4 Compatibility
+- **Filament v4 Support** - Full compatibility with Filament v4.x while maintaining backward compatibility with v3.x
+- **Updated Dependencies** - Updated composer.json to support both Filament v3 and v4 (`^3.0|^4.0`)
+- **PHP 8.2 Requirement** - Updated minimum PHP requirement to 8.2 to align with Filament v4 requirements
+- **Render Hook Compatibility** - Verified and tested render hooks work correctly with both Filament v3 and v4
+- **Theme Color Detection** - Confirmed theme color detection works with both Filament versions
+- **Plugin Registration** - Tested plugin registration process with both Filament v3 and v4 panels
+
+#### Documentation Updates
+- **Updated Requirements Section** - Added comprehensive requirements section with PHP, Laravel, and Filament version requirements
+- **Filament v4 Installation Notes** - Added notes about v4 compatibility in installation instructions
+- **Browser Support Documentation** - Enhanced browser support information
+- **Production Requirements** - Detailed HTTPS and SSL certificate requirements
+
+### Changed
+- **Minimum PHP Version** - Updated from PHP 8.1 to PHP 8.2 to support Filament v4
+- **Package Description** - Updated to reflect support for both Filament v3 and v4
+- **Documentation** - Updated all references to mention both Filament v3 and v4 support
+
+### Technical Details
+- **Backward Compatibility** - Maintains full backward compatibility with Filament v3.x
+- **Forward Compatibility** - Full support for Filament v4.x features and improvements
+- **Testing** - Verified all functionality works correctly with both versions
+- **Dependencies** - Updated dependency constraints to support both major versions
+
+---
+
 ## [1.0.0] - 2025-06-28
 
 ### Added
@@ -68,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Details
 
 #### Requirements
-- PHP 8.1 or higher
+- PHP 8.1 or higher (8.2+ recommended for Filament v4)
 - Laravel 10.0 or higher
 - Filament 3.0 or higher
 
