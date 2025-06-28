@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\File;
 class FilamentPwaSetupCommand extends Command
 {
     protected $signature = 'filament-pwa:setup {--generate-icons} {--validate} {--source=} {--publish-assets}';
-    
+
     protected $description = 'Setup and validate PWA configuration for Filament admin panel';
 
     public function handle()
@@ -28,7 +28,7 @@ class FilamentPwaSetupCommand extends Command
             $this->validatePWA();
         }
 
-        if (!$this->option('generate-icons') && !$this->option('validate') && !$this->option('publish-assets')) {
+        if (! $this->option('generate-icons') && ! $this->option('validate') && ! $this->option('publish-assets')) {
             $this->showPWAStatus();
         }
 
@@ -65,22 +65,23 @@ class FilamentPwaSetupCommand extends Command
         $this->info('📱 Generating PWA icons...');
 
         $sourcePath = $this->option('source') ?: config('filament-pwa.icons.source_path', 'icon.svg');
-        
-        if (!str_starts_with($sourcePath, '/')) {
+
+        if (! str_starts_with($sourcePath, '/')) {
             $sourcePath = public_path($sourcePath);
         }
 
-        if (!File::exists($sourcePath)) {
+        if (! File::exists($sourcePath)) {
             $this->error("Source image not found: {$sourcePath}");
             $this->info('Please provide a source image using --source=path/to/image.svg or --source=path/to/image.png');
+
             return;
         }
 
         // Create icons directory if it doesn't exist
         $outputPath = config('filament-pwa.icons.output_path', 'images/icons');
         $iconsDir = public_path($outputPath);
-        
-        if (!File::exists($iconsDir)) {
+
+        if (! File::exists($iconsDir)) {
             File::makeDirectory($iconsDir, 0755, true);
         }
 
@@ -100,9 +101,10 @@ class FilamentPwaSetupCommand extends Command
     {
         try {
             // Check if Imagick is available for SVG processing
-            if (!extension_loaded('imagick')) {
+            if (! extension_loaded('imagick')) {
                 $this->warn('Imagick extension not available. Falling back to GD with SVG conversion.');
                 $this->generateIconsFromSvgWithGd($svgPath, $iconsDir);
+
                 return;
             }
 
@@ -130,7 +132,7 @@ class FilamentPwaSetupCommand extends Command
 
     protected function generateIconFromSvg($svgPath, $size, $iconsDir)
     {
-        $imagick = new \Imagick();
+        $imagick = new \Imagick;
         $imagick->setBackgroundColor(new \ImagickPixel('transparent'));
         $imagick->readImage($svgPath);
         $imagick->setImageFormat('png');
@@ -157,12 +159,12 @@ class FilamentPwaSetupCommand extends Command
             $padding = intval(($size - $safeSize) / 2);
 
             // Create canvas with theme color background
-            $canvas = new \Imagick();
+            $canvas = new \Imagick;
             $canvas->newImage($size, $size, new \ImagickPixel($themeColor));
             $canvas->setImageFormat('png');
 
             // Load and resize SVG to safe area
-            $icon = new \Imagick();
+            $icon = new \Imagick;
             $icon->setBackgroundColor(new \ImagickPixel('transparent'));
             $icon->readImage($svgPath);
             $icon->setImageFormat('png');
@@ -186,7 +188,7 @@ class FilamentPwaSetupCommand extends Command
 
     protected function generateFaviconFromSvg($svgPath)
     {
-        $imagick = new \Imagick();
+        $imagick = new \Imagick;
         $imagick->setBackgroundColor(new \ImagickPixel('transparent'));
         $imagick->readImage($svgPath);
         $imagick->setImageFormat('png');
@@ -196,20 +198,21 @@ class FilamentPwaSetupCommand extends Command
         $imagick->clear();
         $imagick->destroy();
 
-        $this->line("  ✓ Generated favicon.ico");
+        $this->line('  ✓ Generated favicon.ico');
     }
 
     protected function generateIconsFromRaster($imagePath, $iconsDir)
     {
         try {
             // Check if Intervention Image is available
-            if (!class_exists('Intervention\Image\ImageManager')) {
+            if (! class_exists('Intervention\Image\ImageManager')) {
                 $this->warn('Intervention Image not installed. Using GD fallback.');
                 $this->generateIconsWithGd($imagePath, $iconsDir);
+
                 return;
             }
 
-            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver);
             $sourceImage = $manager->read($imagePath);
 
             $sizes = PwaService::getIconSizes();
@@ -271,7 +274,7 @@ class FilamentPwaSetupCommand extends Command
         $favicon = clone $sourceImage;
         $favicon->resize(32, 32);
         $favicon->save(public_path('favicon.ico'));
-        $this->line("  ✓ Generated favicon.ico");
+        $this->line('  ✓ Generated favicon.ico');
     }
 
     // Additional methods for GD fallback would go here...
@@ -293,7 +296,7 @@ class FilamentPwaSetupCommand extends Command
         }
 
         // Check HTTPS
-        if (!request()->isSecure() && !app()->environment('local')) {
+        if (! request()->isSecure() && ! app()->environment('local')) {
             $this->warn('⚠️  HTTPS is required for PWA installation in production');
         }
 

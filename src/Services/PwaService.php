@@ -12,7 +12,7 @@ class PwaService
     public static function getMetaTags(array $config = []): string
     {
         $config = array_merge(self::getDefaultConfig(), $config);
-        
+
         return View::make('filament-pwa::meta-tags', compact('config'))->render();
     }
 
@@ -22,7 +22,7 @@ class PwaService
     public static function getInstallationScript(array $config = []): string
     {
         $config = array_merge(self::getDefaultConfig(), $config);
-        
+
         return View::make('filament-pwa::installation-script', compact('config'))->render();
     }
 
@@ -33,7 +33,7 @@ class PwaService
     {
         return request()->header('X-Requested-With') === 'PWA' ||
                request()->query('pwa') === '1' ||
-               request()->header('User-Agent', '') !== '' && 
+               request()->header('User-Agent', '') !== '' &&
                str_contains(request()->header('User-Agent'), 'PWA');
     }
 
@@ -43,7 +43,7 @@ class PwaService
     public static function getConfig(array $overrides = []): array
     {
         $config = array_merge(self::getDefaultConfig(), config('filament-pwa', []), $overrides);
-        
+
         return [
             'name' => $config['app_name'],
             'short_name' => $config['short_name'],
@@ -107,13 +107,13 @@ class PwaService
     {
         $icons = [];
         $outputPath = $config['icons']['output_path'] ?? 'images/icons';
-        
+
         foreach (self::getIconSizes() as $size) {
             $icons[] = [
                 'src' => "/{$outputPath}/icon-{$size}x{$size}.png",
                 'sizes' => "{$size}x{$size}",
                 'type' => 'image/png',
-                'purpose' => 'any'
+                'purpose' => 'any',
             ];
         }
 
@@ -124,7 +124,7 @@ class PwaService
                 'src' => "/{$outputPath}/icon-{$size}x{$size}-maskable.png",
                 'sizes' => "{$size}x{$size}",
                 'type' => 'image/png',
-                'purpose' => 'maskable'
+                'purpose' => 'maskable',
             ];
         }
 
@@ -145,10 +145,10 @@ class PwaService
                 'icons' => [
                     [
                         'src' => '/images/icons/icon-96x96.png',
-                        'sizes' => '96x96'
-                    ]
-                ]
-            ]
+                        'sizes' => '96x96',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -158,14 +158,14 @@ class PwaService
     public static function validatePWAAssets(): array
     {
         $errors = [];
-        
+
         // Check manifest file
-        if (!file_exists(public_path('manifest.json'))) {
+        if (! file_exists(public_path('manifest.json'))) {
             $errors[] = 'Manifest file not found';
         }
 
         // Check service worker
-        if (!file_exists(public_path('sw.js'))) {
+        if (! file_exists(public_path('sw.js'))) {
             $errors[] = 'Service worker not found';
         }
 
@@ -173,7 +173,7 @@ class PwaService
         $requiredIcons = [192, 512];
         foreach ($requiredIcons as $size) {
             $iconPath = public_path("images/icons/icon-{$size}x{$size}.png");
-            if (!file_exists($iconPath)) {
+            if (! file_exists($iconPath)) {
                 $errors[] = "Required icon {$size}x{$size} not found";
             }
         }
@@ -187,7 +187,7 @@ class PwaService
     public static function getInstallationPromptData(array $config = []): array
     {
         $config = array_merge(self::getDefaultConfig(), $config);
-        
+
         return [
             'title' => 'Install App',
             'message' => 'Install this app on your device for quick access and offline functionality.',
@@ -198,7 +198,7 @@ class PwaService
                 'Work offline',
                 'Native app experience',
                 'Push notifications',
-                'Improved performance'
+                'Improved performance',
             ],
             'enabled' => $config['installation_prompts']['enabled'] ?? true,
             'delay' => $config['installation_prompts']['delay'] ?? 2000,
@@ -212,7 +212,7 @@ class PwaService
     public static function getServiceWorkerConfig(array $config = []): array
     {
         $swConfig = $config['service_worker'] ?? config('filament-pwa.service_worker', []);
-        
+
         return [
             'cache_name' => $swConfig['cache_name'] ?? 'filament-admin-v1.0.0',
             'offline_url' => $swConfig['offline_url'] ?? '/offline',

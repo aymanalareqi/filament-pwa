@@ -13,7 +13,7 @@ class FilamentPwaSetupCommandTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test directories
         File::makeDirectory(public_path('images/icons'), 0755, true, true);
     }
@@ -22,7 +22,7 @@ class FilamentPwaSetupCommandTest extends TestCase
     {
         // Clean up test files
         File::deleteDirectory(public_path('images'));
-        
+
         parent::tearDown();
     }
 
@@ -76,7 +76,7 @@ class FilamentPwaSetupCommandTest extends TestCase
 <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <circle cx="50" cy="50" r="40" fill="#A77B56"/>
 </svg>';
-        
+
         File::put(public_path('test-icon.svg'), $testSvg);
 
         $this->artisan('filament-pwa:setup --generate-icons --source=test-icon.svg')

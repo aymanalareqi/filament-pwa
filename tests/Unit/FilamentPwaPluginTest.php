@@ -149,7 +149,7 @@ class FilamentPwaPluginTest extends TestCase
     public function it_can_configure_categories()
     {
         $categories = ['productivity', 'business'];
-        
+
         $plugin = FilamentPwaPlugin::make()
             ->categories($categories);
 
@@ -167,7 +167,7 @@ class FilamentPwaPluginTest extends TestCase
                 'url' => '/admin/dashboard',
             ],
         ];
-        
+
         $plugin = FilamentPwaPlugin::make()
             ->shortcuts($shortcuts);
 
@@ -236,7 +236,7 @@ class FilamentPwaPluginTest extends TestCase
 
         // This should not throw an exception
         $plugin->register($panel);
-        
+
         $this->assertTrue(true); // If we get here, registration worked
     }
 
@@ -248,7 +248,7 @@ class FilamentPwaPluginTest extends TestCase
 
         // This should not throw an exception
         $plugin->boot($panel);
-        
+
         $this->assertTrue(true); // If we get here, boot worked
     }
 }

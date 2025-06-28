@@ -16,9 +16,9 @@ class PwaControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/json');
-        
+
         $manifest = $response->json();
-        
+
         $this->assertArrayHasKey('name', $manifest);
         $this->assertArrayHasKey('short_name', $manifest);
         $this->assertArrayHasKey('start_url', $manifest);
@@ -33,9 +33,9 @@ class PwaControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/javascript');
-        
+
         $content = $response->getContent();
-        
+
         $this->assertStringContainsString('CACHE_NAME', $content);
         $this->assertStringContainsString('addEventListener', $content);
     }
@@ -47,9 +47,9 @@ class PwaControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/xml');
-        
+
         $content = $response->getContent();
-        
+
         $this->assertStringContainsString('<browserconfig>', $content);
         $this->assertStringContainsString('<msapplication>', $content);
     }
@@ -71,7 +71,7 @@ class PwaControllerTest extends TestCase
 
         // Required PWA manifest fields
         $requiredFields = ['name', 'short_name', 'start_url', 'display', 'icons'];
-        
+
         foreach ($requiredFields as $field) {
             $this->assertArrayHasKey($field, $manifest, "Manifest missing required field: {$field}");
         }
@@ -88,7 +88,7 @@ class PwaControllerTest extends TestCase
         $this->assertNotEmpty($manifest['icons']);
 
         $iconSizes = array_column($manifest['icons'], 'sizes');
-        
+
         // Check for required icon sizes
         $this->assertContains('192x192', $iconSizes, 'Manifest missing 192x192 icon');
         $this->assertContains('512x512', $iconSizes, 'Manifest missing 512x512 icon');
@@ -150,7 +150,7 @@ class PwaControllerTest extends TestCase
         // Validate XML structure
         $xml = simplexml_load_string($content);
         $this->assertNotFalse($xml, 'Browser config is not valid XML');
-        
+
         $this->assertNotNull($xml->msapplication);
         $this->assertNotNull($xml->msapplication->tile);
     }
@@ -163,7 +163,7 @@ class PwaControllerTest extends TestCase
 
         $this->assertStringContainsString('offline', strtolower($content));
         $this->assertStringContainsString('connection', strtolower($content));
-        
+
         // Check for essential offline page elements
         $this->assertStringContainsString('<html', $content);
         $this->assertStringContainsString('<head>', $content);

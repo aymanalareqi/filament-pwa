@@ -72,7 +72,7 @@ class PwaController extends Controller
     public function offline(): Response
     {
         $config = PwaService::getConfig();
-        
+
         return response()->view('filament-pwa::offline', compact('config'), 200, [
             'Cache-Control' => 'public, max-age=3600',
         ]);

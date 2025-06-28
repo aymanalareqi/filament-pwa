@@ -32,7 +32,7 @@ class PwaServiceTest extends TestCase
 
         $this->assertEquals('Custom App', $config['name']);
         $this->assertEquals('#FF0000', $config['theme_color']);
-        
+
         // Should still have default values for other fields
         $this->assertArrayHasKey('short_name', $config);
         $this->assertArrayHasKey('start_url', $config);
@@ -70,8 +70,8 @@ class PwaServiceTest extends TestCase
         $shortcuts = PwaService::getShortcuts();
 
         $this->assertIsArray($shortcuts);
-        
-        if (!empty($shortcuts)) {
+
+        if (! empty($shortcuts)) {
             foreach ($shortcuts as $shortcut) {
                 $this->assertArrayHasKey('name', $shortcut);
                 $this->assertArrayHasKey('url', $shortcut);
@@ -176,7 +176,7 @@ class PwaServiceTest extends TestCase
         $icons = PwaService::getIconUrls();
 
         $purposes = array_column($icons, 'purpose');
-        
+
         $this->assertContains('any', $purposes);
         $this->assertContains('maskable', $purposes);
     }
@@ -188,7 +188,7 @@ class PwaServiceTest extends TestCase
 
         $this->assertArrayHasKey('cache_patterns', $config);
         $this->assertIsArray($config['cache_patterns']);
-        
+
         // Check for common cache patterns
         $patterns = $config['cache_patterns'];
         $this->assertArrayHasKey('filament_assets', $patterns);
