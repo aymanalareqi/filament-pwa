@@ -1,6 +1,6 @@
 build
 composer.lock
-docs
+# docs
 vendor
 coverage
 .phpunit.result.cache
