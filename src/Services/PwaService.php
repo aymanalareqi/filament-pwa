@@ -388,17 +388,46 @@ class PwaService
     {
         $errors = [];
 
-        // Check manifest file
-        if (! file_exists(public_path('manifest.json'))) {
+        // Check if manifest route is registered
+        $manifestRouteExists = false;
+        $swRouteExists = false;
+
+        try {
+            $routes = app('router')->getRoutes();
+            foreach ($routes as $route) {
+                if ($route->uri() === 'manifest.json') {
+                    $manifestRouteExists = true;
+                }
+                if ($route->uri() === 'sw.js') {
+                    $swRouteExists = true;
+                }
+            }
+        } catch (\Exception $e) {
+            // Fallback: check if routes are accessible via URL generation
+            try {
+                route('filament-pwa.manifest');
+                $manifestRouteExists = true;
+            } catch (\Exception $e) {
+                // Route doesn't exist
+            }
+
+            try {
+                route('filament-pwa.service-worker');
+                $swRouteExists = true;
+            } catch (\Exception $e) {
+                // Route doesn't exist
+            }
+        }
+
+        if (!$manifestRouteExists) {
             $errors[] = 'Manifest file not found';
         }
 
-        // Check service worker
-        if (! file_exists(public_path('sw.js'))) {
+        if (!$swRouteExists) {
             $errors[] = 'Service worker not found';
         }
 
-        // Check required icons
+        // Check required icons (these should be physical files)
         $requiredIcons = [192, 512];
         foreach ($requiredIcons as $size) {
             $iconPath = public_path("images/icons/icon-{$size}x{$size}.png");

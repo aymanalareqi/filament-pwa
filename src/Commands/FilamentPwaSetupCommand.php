@@ -309,58 +309,95 @@ class FilamentPwaSetupCommand extends Command
 
     protected function checkServiceWorker()
     {
-        $swPath = public_path('sw.js');
+        // Check if service worker route is registered
+        $swRouteExists = false;
 
-        if (File::exists($swPath)) {
-            $this->info('✅ Service worker found');
+        try {
+            route('filament-pwa.service-worker');
+            $swRouteExists = true;
+            $this->info('✅ Service worker route registered');
+        } catch (\Exception $e) {
+            $this->error('❌ Service worker route not found');
+        }
 
-            $content = File::get($swPath);
-            if (str_contains($content, 'CACHE_NAME')) {
-                $this->info('✅ Service worker has caching strategy');
-            } else {
-                $this->warn('⚠️  Service worker missing caching strategy');
+        // If route exists, try to get content to check caching strategy
+        if ($swRouteExists) {
+            try {
+                $controller = new \Alareqi\FilamentPwa\Http\Controllers\PwaController();
+                $response = $controller->serviceWorker();
+                $content = $response->getContent();
+
+                if (str_contains($content, 'CACHE_NAME')) {
+                    $this->info('✅ Service worker has caching strategy');
+                } else {
+                    $this->warn('⚠️  Service worker missing caching strategy');
+                }
+            } catch (\Exception $e) {
+                $this->warn('⚠️  Could not verify service worker content');
             }
-        } else {
-            $this->error('❌ Service worker not found');
+        }
+
+        // Also check for physical file (optional)
+        $swPath = public_path('sw.js');
+        if (File::exists($swPath)) {
+            $this->info('ℹ️  Physical service worker file also exists');
         }
     }
 
     protected function checkManifest()
     {
-        $manifestPath = public_path('manifest.json');
+        // Check if manifest route is registered
+        $manifestRouteExists = false;
 
-        if (File::exists($manifestPath)) {
-            $this->info('✅ Web app manifest found');
+        try {
+            route('filament-pwa.manifest');
+            $manifestRouteExists = true;
+            $this->info('✅ Web app manifest route registered');
+        } catch (\Exception $e) {
+            $this->error('❌ Web app manifest route not found');
+        }
 
-            $manifest = json_decode(File::get($manifestPath), true);
+        // If route exists, try to get content to validate manifest structure
+        if ($manifestRouteExists) {
+            try {
+                $controller = new \Alareqi\FilamentPwa\Http\Controllers\PwaController();
+                $response = $controller->manifest();
+                $manifest = $response->getData(true);
 
-            $requiredFields = ['name', 'short_name', 'start_url', 'display', 'icons'];
-            foreach ($requiredFields as $field) {
-                if (isset($manifest[$field])) {
-                    $this->info("✅ Manifest has {$field}");
-                } else {
-                    $this->error("❌ Manifest missing {$field}");
-                }
-            }
-
-            // Check icons
-            if (isset($manifest['icons']) && is_array($manifest['icons'])) {
-                $hasRequiredSizes = false;
-                foreach ($manifest['icons'] as $icon) {
-                    if (in_array($icon['sizes'], ['192x192', '512x512'])) {
-                        $hasRequiredSizes = true;
-                        break;
+                $requiredFields = ['name', 'short_name', 'start_url', 'display', 'icons'];
+                foreach ($requiredFields as $field) {
+                    if (isset($manifest[$field])) {
+                        $this->info("✅ Manifest has {$field}");
+                    } else {
+                        $this->error("❌ Manifest missing {$field}");
                     }
                 }
 
-                if ($hasRequiredSizes) {
-                    $this->info('✅ Manifest has required icon sizes');
-                } else {
-                    $this->warn('⚠️  Manifest missing required icon sizes (192x192, 512x512)');
+                // Check icons
+                if (isset($manifest['icons']) && is_array($manifest['icons'])) {
+                    $hasRequiredSizes = false;
+                    foreach ($manifest['icons'] as $icon) {
+                        if (in_array($icon['sizes'], ['192x192', '512x512'])) {
+                            $hasRequiredSizes = true;
+                            break;
+                        }
+                    }
+
+                    if ($hasRequiredSizes) {
+                        $this->info('✅ Manifest has required icon sizes');
+                    } else {
+                        $this->warn('⚠️  Manifest missing required icon sizes (192x192, 512x512)');
+                    }
                 }
+            } catch (\Exception $e) {
+                $this->warn('⚠️  Could not verify manifest content');
             }
-        } else {
-            $this->error('❌ Web app manifest not found');
+        }
+
+        // Also check for physical file (optional)
+        $manifestPath = public_path('manifest.json');
+        if (File::exists($manifestPath)) {
+            $this->info('ℹ️  Physical manifest file also exists');
         }
     }
 

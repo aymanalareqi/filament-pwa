@@ -610,6 +610,17 @@ chmod 755 public/images/icons
 ],
 ```
 
+**Validation shows "Manifest file not found" or "Service worker not found":**
+```bash
+# This is usually a false positive from older versions
+# The plugin serves these files dynamically through routes, not as physical files
+# Make sure the plugin is properly registered in your service provider
+
+# Check if routes are registered
+php artisan route:list | grep manifest
+php artisan route:list | grep sw.js
+```
+
 **PWA not installable:**
 ```bash
 # Validate PWA requirements
@@ -627,10 +638,12 @@ php artisan filament-pwa:setup --validate
 ```
 
 This checks for:
-- Manifest file existence
-- Service worker file
+- Manifest route registration and accessibility
+- Service worker route registration and accessibility
 - Required icons (192x192, 512x512)
 - HTTPS in production
+
+**Note**: The plugin serves manifest.json and sw.js dynamically through routes, not as physical files. The validation has been updated to check route registration instead of file existence.
 
 ### Debug Information
 
