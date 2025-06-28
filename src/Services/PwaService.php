@@ -32,9 +32,9 @@ class PwaService
     public static function isPWARequest(): bool
     {
         return request()->header('X-Requested-With') === 'PWA' ||
-               request()->query('pwa') === '1' ||
-               request()->header('User-Agent', '') !== '' &&
-               str_contains(request()->header('User-Agent'), 'PWA');
+            request()->query('pwa') === '1' ||
+            request()->header('User-Agent', '') !== '' &&
+            str_contains(request()->header('User-Agent'), 'PWA');
     }
 
     /**
@@ -45,24 +45,71 @@ class PwaService
         $config = array_merge(self::getDefaultConfig(), config('filament-pwa', []), $overrides);
 
         return [
-            'name' => $config['app_name'],
-            'short_name' => $config['short_name'],
-            'description' => $config['description'],
-            'start_url' => $config['start_url'],
-            'display' => $config['display'],
-            'background_color' => $config['background_color'],
-            'theme_color' => $config['theme_color'],
-            'orientation' => $config['orientation'],
-            'scope' => $config['scope'],
-            'lang' => $config['lang'],
-            'dir' => $config['dir'],
-            'categories' => $config['categories'],
-            'prefer_related_applications' => $config['prefer_related_applications'] ?? false,
+            'name' => self::evaluateConfigValue($config['name'] ?? $config['app_name'] ?? $config['name']), // Support both old and new keys
+            'short_name' => self::evaluateConfigValue($config['short_name']),
+            'description' => self::evaluateConfigValue($config['description']),
+            'start_url' => self::evaluateConfigValue($config['start_url']),
+            'display' => self::evaluateConfigValue($config['display']),
+            'background_color' => self::evaluateConfigValue($config['background_color']),
+            'theme_color' => self::evaluateConfigValue($config['theme_color']),
+            'orientation' => self::evaluateConfigValue($config['orientation']),
+            'scope' => self::evaluateConfigValue($config['scope']),
+            'lang' => self::evaluateConfigValue($config['lang']),
+            'dir' => self::evaluateConfigValue($config['dir']),
+            'categories' => self::evaluateConfigValue($config['categories']),
+            'prefer_related_applications' => self::evaluateConfigValue($config['prefer_related_applications'] ?? false),
             'icons' => self::getIconUrls($config),
-            'shortcuts' => $config['shortcuts'] ?? [],
-            'screenshots' => $config['screenshots'] ?? [],
-            'related_applications' => $config['related_applications'] ?? [],
+            'shortcuts' => self::evaluateShortcuts($config['shortcuts'] ?? []),
+            'screenshots' => self::evaluateConfigValue($config['screenshots'] ?? []),
+            'related_applications' => self::evaluateConfigValue($config['related_applications'] ?? []),
+            'installation_prompts' => self::evaluateConfigValue($config['installation'] ?? $config['installation_prompts'] ?? []), // Support both old and new keys
         ];
+    }
+
+    /**
+     * Evaluate a configuration value, executing closures if present
+     *
+     * @param mixed $value The configuration value (could be a closure)
+     * @return mixed The evaluated value
+     */
+    protected static function evaluateConfigValue(mixed $value): mixed
+    {
+        if ($value instanceof \Closure) {
+            return $value();
+        }
+
+        return $value;
+    }
+
+    /**
+     * Evaluate shortcuts array, handling closures for dynamic shortcuts
+     *
+     * @param array $shortcuts The shortcuts configuration
+     * @return array The evaluated shortcuts
+     */
+    protected static function evaluateShortcuts(array $shortcuts): array
+    {
+        $evaluatedShortcuts = [];
+
+        foreach ($shortcuts as $shortcut) {
+            if ($shortcut instanceof \Closure) {
+                $evaluatedShortcut = $shortcut();
+                if (is_array($evaluatedShortcut)) {
+                    $evaluatedShortcuts[] = $evaluatedShortcut;
+                }
+            } else {
+                // Evaluate individual shortcut properties that might be closures
+                $evaluatedShortcuts[] = [
+                    'name' => self::evaluateConfigValue($shortcut['name'] ?? ''),
+                    'short_name' => self::evaluateConfigValue($shortcut['short_name'] ?? $shortcut['name'] ?? ''),
+                    'description' => self::evaluateConfigValue($shortcut['description'] ?? $shortcut['name'] ?? ''),
+                    'url' => self::evaluateConfigValue($shortcut['url'] ?? ''),
+                    'icons' => self::evaluateConfigValue($shortcut['icons'] ?? []),
+                ];
+            }
+        }
+
+        return $evaluatedShortcuts;
     }
 
     /**
@@ -71,7 +118,7 @@ class PwaService
     protected static function getDefaultConfig(): array
     {
         return [
-            'app_name' => config('app.name', 'Laravel') . ' Admin',
+            'name' => config('app.name', 'Laravel') . ' Admin',
             'short_name' => 'Admin',
             'description' => 'Admin panel for ' . config('app.name', 'Laravel'),
             'start_url' => '/admin',
@@ -84,10 +131,15 @@ class PwaService
             'dir' => 'ltr',
             'categories' => ['productivity', 'business'],
             'prefer_related_applications' => false,
-            'installation_prompts' => [
+            'installation' => [
                 'enabled' => true,
-                'delay' => 2000,
+                'prompt_delay' => 2000,
                 'ios_instructions_delay' => 5000,
+            ],
+            'icons' => [
+                'path' => 'images/icons',
+                'sizes' => [72, 96, 128, 144, 152, 192, 384, 512],
+                'maskable_sizes' => [192, 512],
             ],
         ];
     }
@@ -106,9 +158,11 @@ class PwaService
     public static function getIconUrls(array $config = []): array
     {
         $icons = [];
-        $outputPath = $config['icons']['output_path'] ?? 'images/icons';
+        $iconConfig = $config['icons'] ?? [];
+        $outputPath = $iconConfig['path'] ?? $iconConfig['output_path'] ?? 'images/icons'; // Support both old and new keys
 
-        foreach (self::getIconSizes() as $size) {
+        $sizes = $iconConfig['sizes'] ?? self::getIconSizes();
+        foreach ($sizes as $size) {
             $icons[] = [
                 'src' => "/{$outputPath}/icon-{$size}x{$size}.png",
                 'sizes' => "{$size}x{$size}",
@@ -118,7 +172,7 @@ class PwaService
         }
 
         // Add maskable icons
-        $maskableSizes = $config['icons']['maskable_sizes'] ?? [192, 512];
+        $maskableSizes = $iconConfig['maskable_sizes'] ?? [192, 512];
         foreach ($maskableSizes as $size) {
             $icons[] = [
                 'src' => "/{$outputPath}/icon-{$size}x{$size}-maskable.png",
@@ -187,6 +241,7 @@ class PwaService
     public static function getInstallationPromptData(array $config = []): array
     {
         $config = array_merge(self::getDefaultConfig(), $config);
+        $installationConfig = $config['installation'] ?? $config['installation_prompts'] ?? []; // Support both old and new keys
 
         return [
             'title' => 'Install App',
@@ -200,9 +255,9 @@ class PwaService
                 'Push notifications',
                 'Improved performance',
             ],
-            'enabled' => $config['installation_prompts']['enabled'] ?? true,
-            'delay' => $config['installation_prompts']['delay'] ?? 2000,
-            'ios_instructions_delay' => $config['installation_prompts']['ios_instructions_delay'] ?? 5000,
+            'enabled' => $installationConfig['enabled'] ?? true,
+            'delay' => $installationConfig['prompt_delay'] ?? $installationConfig['delay'] ?? 2000, // Support both old and new keys
+            'ios_instructions_delay' => $installationConfig['ios_instructions_delay'] ?? 5000,
         ];
     }
 

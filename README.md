@@ -42,7 +42,9 @@ php artisan vendor:publish --tag="filament-pwa-config"
 
 ## Quick Start
 
-1. Register the plugin in your Panel provider:
+### Method 1: Fluent API (Recommended)
+
+Register the plugin in your Panel provider with fluent configuration:
 
 ```php
 use Alareqi\FilamentPwa\FilamentPwaPlugin;
@@ -50,42 +52,110 @@ use Alareqi\FilamentPwa\FilamentPwaPlugin;
 public function panel(Panel $panel): Panel
 {
     return $panel
-        // ...
-        ->plugin(FilamentPwaPlugin::make());
+        ->plugins([
+            FilamentPwaPlugin::make()
+                ->name('My Admin Panel')
+                ->shortName('Admin')
+                ->themeColor('#3B82F6')
+                ->backgroundColor('#ffffff')
+                ->standalone()
+                ->language('en')
+                ->ltr()
+                ->enableInstallation()
+                ->addShortcut('Dashboard', '/admin')
+                ->addShortcut('Users', '/admin/users'),
+        ]);
 }
 ```
 
-2. Publish the PWA assets:
+### Method 2: Configuration File
 
-```bash
-php artisan vendor:publish --tag="filament-pwa-assets"
+Alternatively, register the plugin and configure via config file:
+
+```php
+use Alareqi\FilamentPwa\FilamentPwaPlugin;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->plugins([
+            FilamentPwaPlugin::make(),
+        ]);
+}
 ```
 
-3. Generate PWA icons from your logo:
+Then configure in `config/filament-pwa.php`:
 
-```bash
-php artisan filament-pwa:setup --generate-icons --source=public/logo.svg
+```php
+return [
+    'name' => 'My Admin Panel',
+    'short_name' => 'Admin',
+    'theme_color' => '#3B82F6',
+    'installation' => [
+        'enabled' => true,
+        'prompt_delay' => 2000,
+    ],
+    // ... more options
+];
 ```
 
-4. Validate your PWA setup:
+### Setup Commands
 
-```bash
-php artisan filament-pwa:setup --validate
-```
+1. **Publish PWA assets:**
+   ```bash
+   php artisan vendor:publish --tag="filament-pwa-assets"
+   ```
 
-That's it! Your Filament admin panel is now a fully-featured PWA.
+2. **Generate PWA icons from your logo:**
+   ```bash
+   php artisan filament-pwa:setup --generate-icons --source=public/logo.svg
+   ```
+
+3. **Validate your PWA setup:**
+   ```bash
+   php artisan filament-pwa:setup --validate
+   ```
+
+That's it! Your Filament admin panel is now a fully-featured PWA with RTL/LTR support.
 
 ## Configuration
 
-The plugin comes with sensible defaults but can be extensively customized. See the [Configuration Guide](docs/configuration.md) for detailed options.
+The plugin offers two configuration approaches:
+
+### 1. Fluent API (Recommended)
+```php
+FilamentPwaPlugin::make()
+    ->name('My App')
+    ->themeColor('#3B82F6')
+    ->standalone()
+    ->rtl()  // For RTL languages
+    ->enableInstallation()
+
+    // Dynamic configuration with closures
+    ->name(fn() => auth()->user()?->company_name ?? 'My App')
+    ->themeColor(fn() => auth()->user()?->theme_color ?? '#3B82F6')
+    ->language(fn() => auth()->user()?->language ?? 'en')
+```
+
+### 2. Configuration File
+```php
+// config/filament-pwa.php
+return [
+    'name' => 'My App',
+    'theme_color' => '#3B82F6',
+    'dir' => 'rtl',  // For RTL languages
+    'installation' => ['enabled' => true],
+];
+```
 
 ## Documentation
 
-- [Installation Guide](docs/installation.md)
-- [Configuration](docs/configuration.md)
-- [Icon Generation](docs/icon-generation.md)
-- [Customization](docs/customization.md)
-- [Troubleshooting](docs/troubleshooting.md)
+- [Configuration Guide](docs/configuration-guide.md) - Complete configuration reference
+- [Configuration Migration](docs/configuration-migration.md) - Upgrade from old versions
+- [Installation Guide](docs/installation.md) - Detailed installation instructions
+- [Icon Generation](docs/icon-generation.md) - PWA icon generation guide
+- [Customization](docs/customization.md) - Advanced customization options
+- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
 
 ## Testing
 

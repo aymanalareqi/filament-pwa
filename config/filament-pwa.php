@@ -9,6 +9,9 @@ return [
     | This file contains the configuration options for the Filament PWA plugin.
     | You can customize various aspects of your Progressive Web App here.
     |
+    | Tip: You can also configure these options using the FilamentPwaPlugin
+    | fluent methods in your panel provider for a more programmatic approach.
+    |
     */
 
     /*
@@ -20,7 +23,7 @@ return [
     |
     */
 
-    'app_name' => env('PWA_APP_NAME', config('app.name', 'Laravel') . ' Admin'),
+    'name' => env('PWA_APP_NAME', config('app.name', 'Laravel') . ' Admin'),
     'short_name' => env('PWA_SHORT_NAME', 'Admin'),
     'description' => env('PWA_DESCRIPTION', 'Admin panel for ' . config('app.name', 'Laravel')),
 
@@ -31,11 +34,14 @@ return [
     |
     | Configure how your PWA should be displayed when installed.
     |
+    | Available display modes: standalone, fullscreen, minimal-ui, browser
+    | Available orientations: portrait, landscape, portrait-primary, landscape-primary, any
+    |
     */
 
     'start_url' => env('PWA_START_URL', '/admin'),
-    'display' => env('PWA_DISPLAY', 'standalone'), // standalone, fullscreen, minimal-ui, browser
-    'orientation' => env('PWA_ORIENTATION', 'portrait-primary'), // portrait, landscape, any
+    'display' => env('PWA_DISPLAY', 'standalone'),
+    'orientation' => env('PWA_ORIENTATION', 'portrait-primary'),
     'scope' => env('PWA_SCOPE', '/admin'),
 
     /*
@@ -56,11 +62,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the language and text direction for your PWA.
+    | Supported directions: ltr, rtl
     |
     */
 
     'lang' => env('PWA_LANG', 'en'),
-    'dir' => env('PWA_DIR', 'ltr'), // ltr, rtl
+    'dir' => env('PWA_DIR', 'ltr'),
 
     /*
     |--------------------------------------------------------------------------
@@ -68,6 +75,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Define the categories that best describe your PWA.
+    | Common categories: productivity, business, utilities, lifestyle, social
     |
     */
 
@@ -79,16 +87,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Installation Prompts
+    | Installation & User Experience
     |--------------------------------------------------------------------------
     |
-    | Configure the PWA installation prompts and banners.
+    | Configure the PWA installation prompts and user experience settings.
     |
     */
 
-    'installation_prompts' => [
-        'enabled' => env('PWA_INSTALLATION_PROMPTS', true),
-        'delay' => env('PWA_INSTALLATION_DELAY', 2000), // milliseconds
+    'installation' => [
+        'enabled' => env('PWA_INSTALLATION_ENABLED', true),
+        'prompt_delay' => env('PWA_INSTALLATION_DELAY', 2000), // milliseconds
         'ios_instructions_delay' => env('PWA_IOS_INSTRUCTIONS_DELAY', 5000), // milliseconds
     ],
 
@@ -97,24 +105,23 @@ return [
     | Icon Configuration
     |--------------------------------------------------------------------------
     |
-    | Configure the icons for your PWA.
+    | Configure the icons for your PWA. Icons will be automatically generated
+    | from your source file using the setup command.
     |
     */
 
     'icons' => [
-        'source_path' => env('PWA_ICON_SOURCE', 'icon.svg'),
-        'output_path' => 'images/icons',
+        'path' => env('PWA_ICONS_PATH', 'images/icons'),
         'sizes' => [72, 96, 128, 144, 152, 192, 384, 512],
         'maskable_sizes' => [192, 512],
-        'additional_sizes' => [16, 32, 70, 150, 310], // For favicons and tiles
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Service Worker Configuration
+    | Service Worker & Caching
     |--------------------------------------------------------------------------
     |
-    | Configure the service worker behavior.
+    | Configure the service worker behavior and caching strategies.
     |
     */
 
@@ -135,21 +142,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Route Middleware
+    | App Shortcuts
     |--------------------------------------------------------------------------
     |
-    | Define the middleware that should be applied to PWA routes.
-    |
-    */
-
-    'route_middleware' => ['web'],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Shortcuts
-    |--------------------------------------------------------------------------
-    |
-    | Define shortcuts that will appear in the PWA app menu.
+    | Define shortcuts that will appear in the PWA app menu when users
+    | long-press the app icon on their device.
     |
     */
 
@@ -170,15 +167,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Screenshots
+    | Advanced Options
     |--------------------------------------------------------------------------
     |
-    | Define screenshots for enhanced installation prompts.
+    | Additional PWA configuration options for advanced use cases.
     |
     */
 
+    // Set to true if you have a native app and want to promote it over the PWA
+    'prefer_related_applications' => env('PWA_PREFER_NATIVE_APP', false),
+
+    // Screenshots for enhanced installation prompts (optional)
     'screenshots' => [
-        // Add screenshots for better installation experience
+        // Example:
         // [
         //     'src' => '/images/screenshots/desktop.png',
         //     'sizes' => '1280x720',
@@ -187,17 +188,9 @@ return [
         // ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Related Applications
-    |--------------------------------------------------------------------------
-    |
-    | Configure related native applications.
-    |
-    */
-
-    'prefer_related_applications' => false,
+    // Related native applications (optional)
     'related_applications' => [
+        // Example:
         // [
         //     'platform' => 'play',
         //     'url' => 'https://play.google.com/store/apps/details?id=com.example.app',
