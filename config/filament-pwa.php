@@ -50,10 +50,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the visual theme of your PWA.
+    | By default, these values attempt to inherit from Filament's design system.
     |
     */
 
-    'theme_color' => env('PWA_THEME_COLOR', '#A77B56'),
+    'theme_color' => env('PWA_THEME_COLOR', null), // Will auto-detect from Filament if null
+
     'background_color' => env('PWA_BACKGROUND_COLOR', '#ffffff'),
 
     /*
@@ -62,12 +64,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the language and text direction for your PWA.
+    | By default, these values inherit from Laravel's app configuration.
     | Supported directions: ltr, rtl
     |
     */
 
-    'lang' => env('PWA_LANG', 'en'),
-    'dir' => env('PWA_DIR', 'ltr'),
+    'lang' => env('PWA_LANG', null), // Will auto-detect from Laravel app locale if null
+    'dir' => env('PWA_DIR', null), // Will auto-detect from language if null
 
     /*
     |--------------------------------------------------------------------------

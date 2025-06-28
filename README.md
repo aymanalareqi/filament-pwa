@@ -17,7 +17,7 @@ A comprehensive Progressive Web App (PWA) plugin for Filament v3 admin panels. T
 - 🎯 **Filament Integration** - Seamless integration with Filament panels using render hooks
 - 📊 **Validation Tools** - Built-in PWA validation and testing commands
 - 🌍 **RTL Support** - Full right-to-left language support
-- 🎨 **Theme Integration** - Automatic theme color integration with Filament
+- 🎨 **Smart Defaults** - Auto-detects theme colors, language, and text direction from Filament/Laravel configuration
 
 ## Installation
 

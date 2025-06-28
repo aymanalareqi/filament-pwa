@@ -11,7 +11,7 @@ class PwaService
      */
     public static function getMetaTags(array $config = []): string
     {
-        $config = array_merge(self::getDefaultConfig(), $config);
+        $config = self::getConfig($config);
 
         return View::make('filament-pwa::meta-tags', compact('config'))->render();
     }
@@ -21,7 +21,7 @@ class PwaService
      */
     public static function getInstallationScript(array $config = []): string
     {
-        $config = array_merge(self::getDefaultConfig(), $config);
+        $config = self::getConfig($config);
 
         return View::make('filament-pwa::installation-script', compact('config'))->render();
     }
@@ -51,11 +51,11 @@ class PwaService
             'start_url' => self::evaluateConfigValue($config['start_url']),
             'display' => self::evaluateConfigValue($config['display']),
             'background_color' => self::evaluateConfigValue($config['background_color']),
-            'theme_color' => self::evaluateConfigValue($config['theme_color']),
+            'theme_color' => self::evaluateConfigValue($config['theme_color'] ?? self::getDefaultThemeColor()),
             'orientation' => self::evaluateConfigValue($config['orientation']),
             'scope' => self::evaluateConfigValue($config['scope']),
-            'lang' => self::evaluateConfigValue($config['lang']),
-            'dir' => self::evaluateConfigValue($config['dir']),
+            'lang' => self::evaluateConfigValue($config['lang'] ?? self::getDefaultLanguage()),
+            'dir' => self::evaluateConfigValue($config['dir'] ?? self::getDefaultDirection()),
             'categories' => self::evaluateConfigValue($config['categories']),
             'prefer_related_applications' => self::evaluateConfigValue($config['prefer_related_applications'] ?? false),
             'icons' => self::getIconUrls($config),
@@ -125,11 +125,11 @@ class PwaService
             'start_url' => '/admin',
             'display' => 'standalone',
             'background_color' => '#ffffff',
-            'theme_color' => '#A77B56',
+            'theme_color' => self::getDefaultThemeColor(),
             'orientation' => 'portrait-primary',
             'scope' => '/admin',
-            'lang' => 'en',
-            'dir' => 'ltr',
+            'lang' => self::getDefaultLanguage(),
+            'dir' => self::getDefaultDirection(),
             'categories' => ['productivity', 'business'],
             'prefer_related_applications' => false,
             'installation' => [
@@ -152,6 +152,177 @@ class PwaService
     public static function getIconSizes(): array
     {
         return config('filament-pwa.icons.sizes', [72, 96, 128, 144, 152, 192, 384, 512]);
+    }
+
+    /**
+     * Get default theme color from Filament or fallback
+     */
+    protected static function getDefaultThemeColor(): string
+    {
+        try {
+            // Method 1: Try to get from Filament Facades
+            if (class_exists(\Filament\Facades\Filament::class)) {
+                $panels = \Filament\Facades\Filament::getPanels();
+                $adminPanel = $panels['admin'] ?? collect($panels)->first();
+
+                if ($adminPanel && method_exists($adminPanel, 'getColors')) {
+                    $colors = $adminPanel->getColors();
+                    $primaryColor = self::extractPrimaryColor($colors);
+                    if ($primaryColor) {
+                        return $primaryColor;
+                    }
+                }
+            }
+
+            // Method 2: Try to get from PanelManager directly
+            if (class_exists(\Filament\PanelManager::class)) {
+                $panelManager = app(\Filament\PanelManager::class);
+                $panels = $panelManager->getPanels();
+                $adminPanel = $panels['admin'] ?? collect($panels)->first();
+
+                if ($adminPanel && method_exists($adminPanel, 'getColors')) {
+                    $colors = $adminPanel->getColors();
+                    $primaryColor = self::extractPrimaryColor($colors);
+                    if ($primaryColor) {
+                        return $primaryColor;
+                    }
+                }
+            }
+
+            // Method 3: Try to get from Filament config if available
+            if (function_exists('config')) {
+                $filamentConfig = config('filament.theme.colors.primary');
+                if ($filamentConfig) {
+                    $primaryColor = self::extractPrimaryColor(['primary' => $filamentConfig]);
+                    if ($primaryColor) {
+                        return $primaryColor;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fall back to default if Filament is not available
+        }
+
+        return '#6366f1'; // Tailwind Indigo 500 (Filament's default)
+    }
+
+    /**
+     * Extract primary color from Filament colors configuration
+     */
+    protected static function extractPrimaryColor(array $colors): ?string
+    {
+        if (!isset($colors['primary'])) {
+            return null;
+        }
+
+        $primary = $colors['primary'];
+
+        // Handle string colors (hex, rgb, etc.)
+        if (is_string($primary)) {
+            // If it's already a hex color, return it
+            if (preg_match('/^#[0-9a-f]{6}$/i', $primary)) {
+                return $primary;
+            }
+            // If it's a named color or other format, try to convert
+            return $primary;
+        }
+
+        // Handle array colors (Filament Color class format)
+        if (is_array($primary)) {
+            // Try different shades in order of preference
+            $preferredShades = [600, 500, 700, 400, 800, 300, 900, 200, 100, 50];
+
+            foreach ($preferredShades as $shade) {
+                if (isset($primary[$shade])) {
+                    $rgb = $primary[$shade];
+                    if (is_string($rgb)) {
+                        // Handle "r, g, b" format
+                        if (strpos($rgb, ',') !== false) {
+                            $rgbValues = array_map('trim', explode(',', $rgb));
+                            if (count($rgbValues) === 3) {
+                                return sprintf(
+                                    '#%02x%02x%02x',
+                                    (int)$rgbValues[0],
+                                    (int)$rgbValues[1],
+                                    (int)$rgbValues[2]
+                                );
+                            }
+                        }
+                        // Handle hex format
+                        if (preg_match('/^#?[0-9a-f]{6}$/i', $rgb)) {
+                            return strpos($rgb, '#') === 0 ? $rgb : '#' . $rgb;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Debug method to check color detection
+     * This method helps troubleshoot color detection issues
+     */
+    public static function debugColorDetection(): array
+    {
+        $debug = [
+            'config_file_theme_color' => config('filament-pwa.theme_color'),
+            'env_theme_color' => env('PWA_THEME_COLOR'),
+            'detected_theme_color' => null,
+            'filament_available' => false,
+            'panels_found' => [],
+            'colors_found' => [],
+            'final_config' => null,
+        ];
+
+        try {
+            // Check if Filament is available
+            if (class_exists(\Filament\Facades\Filament::class)) {
+                $debug['filament_available'] = true;
+                $panels = \Filament\Facades\Filament::getPanels();
+                $debug['panels_found'] = array_keys($panels);
+
+                $adminPanel = $panels['admin'] ?? collect($panels)->first();
+                if ($adminPanel && method_exists($adminPanel, 'getColors')) {
+                    $colors = $adminPanel->getColors();
+                    $debug['colors_found'] = $colors;
+                }
+            }
+
+            $debug['detected_theme_color'] = self::getDefaultThemeColor();
+            $debug['final_config'] = self::getConfig();
+        } catch (\Exception $e) {
+            $debug['error'] = $e->getMessage();
+        }
+
+        return $debug;
+    }
+
+    /**
+     * Get default language from Laravel app locale
+     */
+    protected static function getDefaultLanguage(): string
+    {
+        try {
+            return app()->getLocale();
+        } catch (\Exception $e) {
+            return 'en';
+        }
+    }
+
+    /**
+     * Get default text direction based on language
+     */
+    protected static function getDefaultDirection(): string
+    {
+        try {
+            $locale = app()->getLocale();
+            $rtlLocales = ['ar', 'he', 'fa', 'ur', 'ku', 'dv', 'ps', 'sd', 'yi'];
+            return in_array($locale, $rtlLocales) ? 'rtl' : 'ltr';
+        } catch (\Exception $e) {
+            return 'ltr';
+        }
     }
 
     /**
@@ -242,7 +413,7 @@ class PwaService
      */
     public static function getInstallationPromptData(array $config = []): array
     {
-        $config = array_merge(self::getDefaultConfig(), $config);
+        $config = self::getConfig($config);
         $installationConfig = $config['installation'] ?? $config['installation_prompts'] ?? []; // Support both old and new keys
 
         return [
