@@ -135,6 +135,9 @@ FilamentPwaPlugin::make()
     ->name(fn() => auth()->user()?->company_name ?? 'My App')
     ->themeColor(fn() => auth()->user()?->theme_color ?? '#3B82F6')
     ->language(fn() => auth()->user()?->language ?? 'en')
+
+    // Debug mode: Always show installation banner during development
+    ->enableDebugBanner()  // Useful for testing PWA installation flow
 ```
 
 ### 2. Configuration File

@@ -98,6 +98,11 @@ return [
         'enabled' => env('PWA_INSTALLATION_ENABLED', true),
         'prompt_delay' => env('PWA_INSTALLATION_DELAY', 2000), // milliseconds
         'ios_instructions_delay' => env('PWA_IOS_INSTRUCTIONS_DELAY', 5000), // milliseconds
+
+        // Debug-only option: Always show installation banner in debug mode
+        // This bypasses dismissal logic and browser installation state checks
+        // Useful for testing PWA installation flow during development
+        'show_banner_in_debug' => env('PWA_SHOW_BANNER_IN_DEBUG', true),
     ],
 
     /*

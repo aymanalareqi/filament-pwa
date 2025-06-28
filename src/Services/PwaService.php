@@ -63,6 +63,7 @@ class PwaService
             'screenshots' => self::evaluateConfigValue($config['screenshots'] ?? []),
             'related_applications' => self::evaluateConfigValue($config['related_applications'] ?? []),
             'installation_prompts' => self::evaluateConfigValue($config['installation'] ?? $config['installation_prompts'] ?? []), // Support both old and new keys
+            'installation' => self::evaluateConfigValue($config['installation'] ?? $config['installation_prompts'] ?? []), // New installation config structure
         ];
     }
 
@@ -135,6 +136,7 @@ class PwaService
                 'enabled' => true,
                 'prompt_delay' => 2000,
                 'ios_instructions_delay' => 5000,
+                'show_banner_in_debug' => true,
             ],
             'icons' => [
                 'path' => 'images/icons',

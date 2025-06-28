@@ -38,6 +38,14 @@ class PWAInstaller {
         // Create install banner
         this.createInstallBanner();
 
+        // In debug mode, show banner immediately if enabled
+        const isDebugMode = {{ config('app.debug') ? 'true' : 'false' }};
+        const showBannerInDebug = this.config.installation?.show_banner_in_debug ?? true;
+        if (isDebugMode && showBannerInDebug && this.banner) {
+            console.log('[PWA] Debug mode: Showing banner immediately');
+            this.showInstallBanner();
+        }
+
         // Handle iOS installation
         this.handleIOSInstallation();
     }
@@ -85,8 +93,17 @@ class PWAInstaller {
     }
 
     createInstallBanner() {
-        // Don't show banner if already installed or disabled
-        if (this.isInstalled || !this.config.installation_prompts?.enabled) return;
+        // Check if we should show banner in debug mode
+        const isDebugMode = {{ config('app.debug') ? 'true' : 'false' }};
+        const showBannerInDebug = this.config.installation?.show_banner_in_debug ?? true;
+
+        // In debug mode, bypass installation and dismissal checks if debug banner is enabled
+        if (isDebugMode && showBannerInDebug) {
+            console.log('[PWA] Debug mode: Showing installation banner regardless of state');
+        } else {
+            // Normal logic: Don't show banner if already installed or disabled
+            if (this.isInstalled || !this.config.installation_prompts?.enabled) return;
+        }
 
         const banner = document.createElement('div');
         banner.className = 'pwa-install-banner';
@@ -127,7 +144,24 @@ class PWAInstaller {
     }
 
     showInstallBanner() {
-        if (!this.banner || this.isInstalled) return;
+        if (!this.banner) return;
+
+        // Check if we should show banner in debug mode
+        const isDebugMode = {{ config('app.debug') ? 'true' : 'false' }};
+        const showBannerInDebug = this.config.installation?.show_banner_in_debug ?? true;
+
+        // In debug mode, bypass all checks if debug banner is enabled
+        if (isDebugMode && showBannerInDebug) {
+            console.log('[PWA] Debug mode: Bypassing dismissal and installation checks');
+            const delay = this.config.installation?.prompt_delay || this.config.installation_prompts?.delay || 2000;
+            setTimeout(() => {
+                this.banner.classList.add('show');
+            }, delay);
+            return;
+        }
+
+        // Normal logic: Check installation status and dismissal
+        if (this.isInstalled) return;
 
         // Don't show if user dismissed recently
         const dismissed = localStorage.getItem('pwa-banner-dismissed');

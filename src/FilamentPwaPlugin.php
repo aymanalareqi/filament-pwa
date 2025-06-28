@@ -24,13 +24,13 @@ class FilamentPwaPlugin implements Plugin
         // Register PWA meta tags in the head
         $panel->renderHook(
             PanelsRenderHook::HEAD_START,
-            fn (): string => PwaService::getMetaTags($mergedConfig)
+            fn(): string => PwaService::getMetaTags($mergedConfig)
         );
 
         // Register PWA installation script at the end of body
         $panel->renderHook(
             PanelsRenderHook::BODY_END,
-            fn (): string => PwaService::getInstallationScript($mergedConfig)
+            fn(): string => PwaService::getInstallationScript($mergedConfig)
         );
     }
 
@@ -262,12 +262,13 @@ class FilamentPwaPlugin implements Plugin
     /**
      * Configure installation prompts
      */
-    public function installation(bool $enabled = true, int $promptDelay = 2000, int $iosInstructionsDelay = 5000): static
+    public function installation(bool $enabled = true, int $promptDelay = 2000, int $iosInstructionsDelay = 5000, ?bool $showBannerInDebug = null): static
     {
         $this->config['installation'] = [
             'enabled' => $enabled,
             'prompt_delay' => $promptDelay,
             'ios_instructions_delay' => $iosInstructionsDelay,
+            'show_banner_in_debug' => $showBannerInDebug ?? true,
         ];
 
         return $this;
@@ -287,6 +288,30 @@ class FilamentPwaPlugin implements Plugin
     public function disableInstallation(): static
     {
         return $this->installation(false);
+    }
+
+    /**
+     * Enable debug mode for installation banner
+     * This will always show the installation banner in debug mode,
+     * bypassing dismissal logic and browser installation state checks
+     */
+    public function enableDebugBanner(bool $enabled = true): static
+    {
+        if (!isset($this->config['installation'])) {
+            $this->config['installation'] = [];
+        }
+
+        $this->config['installation']['show_banner_in_debug'] = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * Disable debug mode for installation banner
+     */
+    public function disableDebugBanner(): static
+    {
+        return $this->enableDebugBanner(false);
     }
 
     /**
