@@ -215,7 +215,7 @@ class PwaService
             $configPaths = [
                 'filament.theme.colors.primary',
                 'filament.colors.primary',
-                'filament.default.colors.primary'
+                'filament.default.colors.primary',
             ];
 
             foreach ($configPaths as $configPath) {
@@ -285,7 +285,6 @@ class PwaService
             // Continue to fallback methods
         }
 
-        return null;
     }
 
     /**
@@ -294,11 +293,12 @@ class PwaService
     protected static function extractColorFromPanel($panel): ?string
     {
         try {
-            if (!$panel || !method_exists($panel, 'getColors')) {
+            if (! $panel || ! method_exists($panel, 'getColors')) {
                 return null;
             }
 
             $colors = $panel->getColors();
+
             return self::extractPrimaryColor($colors);
         } catch (\Exception $e) {
             return null;
@@ -342,6 +342,7 @@ class PwaService
             // Try to convert to string
             if (method_exists($primary, '__toString')) {
                 $colorString = (string) $primary;
+
                 return self::normalizeColorValue($colorString);
             }
         }
@@ -468,6 +469,7 @@ class PwaService
             $r = $color[1] . $color[1];
             $g = $color[2] . $color[2];
             $b = $color[3] . $color[3];
+
             return '#' . $r . $g . $b;
         }
 
@@ -558,7 +560,7 @@ class PwaService
             $configPaths = [
                 'filament.theme.colors.primary',
                 'filament.colors.primary',
-                'filament.default.colors.primary'
+                'filament.default.colors.primary',
             ];
 
             foreach ($configPaths as $configPath) {
