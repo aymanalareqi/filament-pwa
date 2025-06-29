@@ -316,7 +316,12 @@ class PwaService
 
         $primary = $colors['primary'];
 
-        // Handle Filament Color objects (v4 compatibility)
+        // Handle Filament v4 Color constants (arrays with OKLCH values)
+        if (is_array($primary)) {
+            return self::extractFromColorArray($primary);
+        }
+
+        // Handle Filament Color objects (v3 compatibility)
         if (is_object($primary)) {
             // Try to get the color value from Filament Color object
             if (method_exists($primary, 'getColor')) {
@@ -346,11 +351,6 @@ class PwaService
             return self::normalizeColorValue($primary);
         }
 
-        // Handle array colors (Filament Color class format)
-        if (is_array($primary)) {
-            return self::extractFromColorArray($primary);
-        }
-
         return null;
     }
 
@@ -364,9 +364,26 @@ class PwaService
 
         foreach ($preferredShades as $shade) {
             if (isset($colorArray[$shade])) {
-                $rgb = $colorArray[$shade];
-                if (is_string($rgb)) {
-                    $normalized = self::normalizeColorValue($rgb);
+                $colorValue = $colorArray[$shade];
+                if (is_string($colorValue)) {
+                    // Handle Filament v4 OKLCH format
+                    if (str_starts_with($colorValue, 'oklch(')) {
+                        try {
+                            // Use Filament's built-in color conversion
+                            if (class_exists(\Filament\Support\Colors\Color::class)) {
+                                $rgb = \Filament\Support\Colors\Color::convertToRgb($colorValue);
+                                $hex = self::convertRgbToHex($rgb);
+                                if ($hex) {
+                                    return $hex;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Fall back to normalization
+                        }
+                    }
+
+                    // Try standard color normalization
+                    $normalized = self::normalizeColorValue($colorValue);
                     if ($normalized) {
                         return $normalized;
                     }
@@ -377,6 +394,21 @@ class PwaService
         // If no shade-based color found, try direct color values
         foreach ($colorArray as $key => $value) {
             if (is_string($value)) {
+                // Handle OKLCH format for direct values too
+                if (str_starts_with($value, 'oklch(')) {
+                    try {
+                        if (class_exists(\Filament\Support\Colors\Color::class)) {
+                            $rgb = \Filament\Support\Colors\Color::convertToRgb($value);
+                            $hex = self::convertRgbToHex($rgb);
+                            if ($hex) {
+                                return $hex;
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Continue to normalization
+                    }
+                }
+
                 $normalized = self::normalizeColorValue($value);
                 if ($normalized) {
                     return $normalized;
@@ -437,6 +469,26 @@ class PwaService
             $g = $color[2] . $color[2];
             $b = $color[3] . $color[3];
             return '#' . $r . $g . $b;
+        }
+
+        return null;
+    }
+
+    /**
+     * Convert RGB string to hex format
+     */
+    protected static function convertRgbToHex(string $rgb): ?string
+    {
+        // Handle rgb(r, g, b) format
+        if (preg_match('/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i', $rgb, $matches)) {
+            $r = (int) $matches[1];
+            $g = (int) $matches[2];
+            $b = (int) $matches[3];
+
+            // Validate RGB values
+            if ($r >= 0 && $r <= 255 && $g >= 0 && $g <= 255 && $b >= 0 && $b <= 255) {
+                return sprintf('#%02x%02x%02x', $r, $g, $b);
+            }
         }
 
         return null;
