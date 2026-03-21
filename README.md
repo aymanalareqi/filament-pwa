@@ -41,7 +41,7 @@ A comprehensive Progressive Web App (PWA) plugin for Filament v3 and v4 admin pa
 
 - **PHP**: 8.2 or higher
 - **Laravel**: 10.0 or higher
-- **Filament**: 3.0 or 4.0
+- **Filament**: 3.0, 4.0, or 5.0
 
 ### Optional Dependencies
 
