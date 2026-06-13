@@ -105,6 +105,151 @@ class PWAInstaller {
             if (this.isInstalled || !this.config.installation_prompts?.enabled) return;
         }
 
+        // Add styles for the banner if not already added
+        if (!document.getElementById('pwa-banner-styles')) {
+            const bannerStyles = document.createElement('style');
+            bannerStyles.id = 'pwa-banner-styles';
+            bannerStyles.textContent = `
+                .pwa-install-banner {
+                    position: fixed;
+                    bottom: 20px;
+                    ${this.config.dir === 'rtl' ? 'right' : 'left'}: 20px;
+                    ${this.config.dir === 'rtl' ? 'left' : 'right'}: 20px;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+                    z-index: 10000;
+                    transform: translateY(150%);
+                    transition: transform 0.3s ease-in-out;
+                    max-width: calc(100% - 40px);
+                    width: auto;
+                    min-width: 280px;
+                    direction: ${this.config.dir || 'ltr'};
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                }
+
+                .pwa-install-banner.show {
+                    transform: translateY(0);
+                }
+
+                .pwa-install-content {
+                    padding: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    flex-wrap: wrap;
+                }
+
+                .pwa-install-text {
+                    flex: 1;
+                    min-width: 150px;
+                }
+
+                .pwa-install-title {
+                    font-weight: 600;
+                    margin-bottom: 0.25rem;
+                    color: #1f2937;
+                    font-size: 1rem;
+                    line-height: 1.4;
+                }
+
+                .pwa-install-description {
+                    font-size: 0.875rem;
+                    color: #6b7280;
+                    line-height: 1.4;
+                }
+
+                .pwa-install-actions {
+                    display: flex;
+                    gap: 0.5rem;
+                    flex-wrap: wrap;
+                }
+
+                .pwa-install-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.5rem 1rem;
+                    border: 1px solid #e5e7eb;
+                    background: white;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    color: #4b5563;
+                }
+
+                .pwa-install-btn.primary {
+                    background: ${this.config.theme_color || '#3b82f6'};
+                    border-color: ${this.config.theme_color || '#3b82f6'};
+                    color: white;
+                }
+
+                .pwa-install-btn.primary:hover {
+                    opacity: 0.9;
+                    transform: translateY(-1px);
+                }
+
+                .pwa-install-btn:hover:not(.primary) {
+                    background: #f9fafb;
+                    border-color: #d1d5db;
+                }
+
+                .pwa-install-icon {
+                    width: 1rem;
+                    height: 1rem;
+                    flex-shrink: 0;
+                }
+
+                @media (max-width: 640px) {
+                    .pwa-install-content {
+                        flex-direction: column;
+                        text-align: center;
+                    }
+
+                    .pwa-install-actions {
+                        width: 100%;
+                        justify-content: center;
+                    }
+
+                    .pwa-install-banner {
+                        bottom: 10px;
+                        ${this.config.dir === 'rtl' ? 'right' : 'left'}: 10px;
+                        ${this.config.dir === 'rtl' ? 'left' : 'right'}: 10px;
+                        max-width: calc(100% - 20px);
+                        min-width: auto;
+                    }
+                }
+
+                @media (prefers-color-scheme: dark) {
+                    .pwa-install-banner {
+                        background: #1f2937;
+                        border-color: #374151;
+                    }
+
+                    .pwa-install-title {
+                        color: #f9fafb;
+                    }
+
+                    .pwa-install-description {
+                        color: #9ca3af;
+                    }
+
+                    .pwa-install-btn {
+                        background: #374151;
+                        border-color: #4b5563;
+                        color: #e5e7eb;
+                    }
+
+                    .pwa-install-btn:hover:not(.primary) {
+                        background: #4b5563;
+                    }
+                }
+            `;
+            document.head.appendChild(bannerStyles);
+        }
+
         const banner = document.createElement('div');
         banner.className = 'pwa-install-banner';
         banner.innerHTML = `
